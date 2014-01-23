@@ -16,6 +16,11 @@
 	</head>
 	<body>
 		<div id='gallery'>
+			<div class='listContainer'>
+				{% for x in columns %}
+					<ul class='imageList' id='imageList{{ x }}'></ul>
+				{% endfor %}
+			</div>
 
 		</div>
 

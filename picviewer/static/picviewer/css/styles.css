@@ -2,9 +2,49 @@ body {
 }
 
 img {
-	margin: 10px;
+
 }
 
-.wrapper{
+.wrapper {
 	text-align: center;
 }
+
+.listContainer {
+	list-style-type: none;
+	padding: 0px;
+}
+
+.imageList {
+	padding: 0px;
+	display: inline-block;
+	vertical-align: top;
+}
+
+
+.imageContainer {
+	margin: 10px;
+	padding: 0px;
+	position: relative;
+}
+.imageLink {
+	position: relative;
+}
+.imageOverlay {
+	display:none;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	word-wrap: break-word;
+	width: 100%;
+	text-align: center;
+	padding-bottom:5px;
+	padding-top:5px;
+	background: rgb(255, 255, 255); /* The Fallback */
+	background: rgba(255, 255, 255, 0.5);
+	z-index: 5;
+}
+
+a.permalink{
+	text-decoration: none;
+}
+
