@@ -1,5 +1,5 @@
 application: redditpicviewer
-version: 1
+version: 2
 runtime: python27
 api_version: 1
 threadsafe: true
@@ -8,7 +8,7 @@ threadsafe: true
 libraries:
 
 - name: django
-  version: latest
+  version: 1.5
 
 handlers:
 - url: /static

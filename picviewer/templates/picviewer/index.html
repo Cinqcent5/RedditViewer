@@ -15,17 +15,27 @@
 		<!-- Date: 2014-01-22 -->
 	</head>
 	<body>
-		<div id='gallery'>
-			<div class='listContainer'>
-				{% for x in columns %}
-					<ul class='imageList' id='imageList{{ x }}'></ul>
-				{% endfor %}
-			</div>
 
+		<div id='subredditsBar'>
+			<a class='subredditURL' href="{% url 'picviewer:default' %}">FRONT</a>
+			<span class="separator">-</span>
+			<a class='subredditURL' href="{% url 'picviewer:subreddit' 'all' %}">ALL</a>
+			<span class="separator">|</span>
+			{% for sr in subreddits %}
+			<a class='subredditURL' href="{% url 'picviewer:subreddit' sr %}">{{sr|upper}}</a>
+			{% if not forloop.last%}
+			<span class="separator">-</span>
+			{% endif %}
+			{% endfor %}
+		</div>
+		<div id='gallery'>
+			{% for x in columns %}
+			<ul class='imageList' id='imageList{{ x }}'></ul>
+			{% endfor %}
 		</div>
 
-		<div class="wrapper">
-			<button id="loadMoreButton" onclick="sendRequest()">
+		<div class="centerWrapper">
+			<button id="loadMoreButton" onclick="sendRequest('{{subreddit}}')">
 				Load more
 			</button>
 			<img src="{% static 'picviewer/media/loading.gif' %}" id='loadingGif' alt='Loading...'>
@@ -33,7 +43,7 @@
 	</body>
 
 	<script>
-        sendRequest();
+        sendRequest('{{subreddit}}');
 	</script>
 </html>
 

@@ -1,7 +1,13 @@
 from django.shortcuts import render
 
 
-def index(request):
-    context = {};
+def default(request):
+    return loadSubreddit(request, '')
+
+def loadSubreddit(request,subreddit):
+    context = {}
     context['columns'] = [i for i in range(4)]
-    return render(request,'picviewer/index.html',context)
+    context['subreddits'] = ['adviceanimals', 'aww', 'earthporn', 'funny', 'gaming', 'gifs', 'pics', 'reactiongifs', 'wallpapers', 'wtf']
+    context['subreddit'] = subreddit;
+    return render(request, 'picviewer/index.html', context)
+

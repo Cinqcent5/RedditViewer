@@ -5,5 +5,7 @@ from picviewer import views
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^', views.index),
+                       
+    url(r'^r/(?P<subreddit>[A-z0-9+]+)$', views.loadSubreddit,name='subreddit' ),
+    url(r'^$', views.default, name='default'),
 )
