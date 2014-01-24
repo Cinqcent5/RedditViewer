@@ -1,6 +1,8 @@
 var baseLink = "http://www.reddit.com";
 var lastFullname = "";
+var pendingRequest=false;
 function sendRequest(subreddit) {
+    pendingRequest=true;
     $("#loadingGif").show();
     $("#loadMoreButton").hide();
 
@@ -23,6 +25,7 @@ function stateChangeHandlers() {
         } else {
             alert("Connection Error\nStatus code: " + this.status + "\n" + this.responseText);
         }
+        pendingRequest=false;
         $("#loadingGif").hide();
         $("#loadMoreButton").show();
     }
@@ -81,3 +84,11 @@ function displayOverlay(obj, show) {
         obj.lastChild.style.display = 'none';
     }
 }
+
+$(window).scroll(function() {
+   if($(window).scrollTop() + $(window).height() >= $(document).height()-2) {
+       if(pendingRequest==false){
+        sendRequest(subreddit);
+       }
+   }
+});
