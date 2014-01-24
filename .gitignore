@@ -51,3 +51,4 @@ docs/_build/
 
 # Collected static files
 /static
+/analytics
