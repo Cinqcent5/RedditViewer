@@ -1,8 +1,9 @@
 var baseLink = "http://www.reddit.com";
 var lastFullname = "";
-var pendingRequest=false;
+var pendingRequest = false;
+var minCol = -1;
 function sendRequest(subreddit) {
-    pendingRequest=true;
+    pendingRequest = true;
     $("#loadingGif").show();
     $("#loadMoreButton").hide();
 
@@ -16,6 +17,16 @@ function sendRequest(subreddit) {
     httprequest.open("GET", link, true);
     httprequest.send();
     httprequest.onreadystatechange = stateChangeHandlers;
+
+    // calculates the shortest column
+    var min = document.getElementById("imageList0").offsetHeight;
+    for (var j = 1; j < 4; j++) {
+        var curMin = document.getElementById("imageList" + j).offsetHeight;
+        if (curMin < min) {
+            minCol = j;
+            min = curMin;
+        }
+    }
 }
 
 function stateChangeHandlers() {
@@ -25,7 +36,7 @@ function stateChangeHandlers() {
         } else {
             alert("Connection Error\nStatus code: " + this.status + "\n" + this.responseText);
         }
-        pendingRequest=false;
+        pendingRequest = false;
         $("#loadingGif").hide();
         $("#loadMoreButton").show();
     }
@@ -35,7 +46,8 @@ function parseJSON(responseText) {
     var width = 350;
     var responseJSON = JSON.parse(responseText);
     var submissions = responseJSON.data.children;
-    var currentColumn = 0;
+    var currentColumn = minCol >= 0 ? minCol : 0;
+
     for (var i = 0; i < submissions.length; i++) {
         var data = submissions[i].data;
         var permalink = data.permalink;
@@ -66,7 +78,13 @@ function parseJSON(responseText) {
             var imageHTML = "<a class='imageLink' href=" + url + " target=_blank><img class='image' src=" + thumbUrl + " width=" + width + "></a>";
             var overlayHTML = "<span class='imageOverlay'><a class='permalink' href=" + baseLink + permalink + " target=_blank>" + title + "</a></span>";
             document.getElementById("imageList" + currentColumn).innerHTML += containerHTML + imageHTML + overlayHTML + "</ul>";
-            currentColumn = (currentColumn + 1) % 4;
+
+            // fill the first two images to the shortest column to let it catch up
+            if (minCol >= 0) {
+                minCol = -1;
+            } else {
+                currentColumn = (currentColumn + 1) % 4;
+            }
         }
     }
 
@@ -85,10 +103,11 @@ function displayOverlay(obj, show) {
     }
 }
 
+
 $(window).scroll(function() {
-   if($(window).scrollTop() + $(window).height() >= $(document).height()-2) {
-       if(pendingRequest==false){
-        sendRequest(subreddit);
-       }
-   }
+    if ($(window).scrollTop() + $(window).height() >= $(document).height() - 2) {
+        if (pendingRequest == false) {
+            sendRequest(subreddit);
+        }
+    }
 });
