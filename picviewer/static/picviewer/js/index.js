@@ -5,6 +5,7 @@ function CurrentState(subreddit) {
     this.pendingRequest = false;
     this.subredditSearchRequest = null;
     this.minCol = -1;
+    this.maxCol = -1;
     this.alreadyShown = {};
 }
 
@@ -25,14 +26,25 @@ function sendRequest() {
     httprequest.send();
     httprequest.onreadystatechange = stateChangeHandlers;
 
-    // calculates the shortest column
+    // calculates the shortest and highest column
     var min = document.getElementById("imageList0").offsetHeight;
+    var max = document.getElementById("imageList0").offsetHeight;
     for (var j = 1; j < 4; j++) {
-        var curMin = document.getElementById("imageList" + j).offsetHeight;
-        if (curMin < min) {
+        var curHeight = document.getElementById("imageList" + j).offsetHeight;
+        if (curHeight < min) {
             currentState.minCol = j;
-            min = curMin;
+            min = curHeight;
         }
+        if (curHeight > max) {
+            currentState.maxCol = j;
+            max = curHeight;
+        }
+    }
+
+    // if for some reason max and min columns are the same, reset them
+    if (currentState.minCol == currentState.maxCol) {
+        currentState.minCol = 0;
+        currentState.maxCol = -1;
     }
 };
 
@@ -84,14 +96,23 @@ function parseJSON(responseText) {
             }
             // Only display the link if it's a image
             if (isPicture) {
+
+                // If this is the max column, skip the first turn to let others catch up
+                if (currentState.maxCol >= 0 && currentColumn == currentState.maxCol) {
+                    currentState.maxCol = -1;
+                    currentColumn = (currentColumn + 1) % 4;
+                }
+
                 var containerHTML = "<ul class='imageContainer' id='" + fullname + "' onmouseover='displayOverlay(this,true)' onmouseout='displayOverlay(this,false)'>";
                 var imageHTML = "<a class='imageLink' href=" + url + " target=_blank><img class='image' src=" + thumbUrl + " width=" + width + "></a>";
                 var overlayHTML = "<span class='imageOverlay'><a class='permalink' href=" + currentState.baseLink + permalink + " target=_blank>" + title + "</a></span>";
                 document.getElementById("imageList" + currentColumn).innerHTML += containerHTML + imageHTML + overlayHTML + "</ul>";
 
+                // Column balancing
+
                 // fill the first two images to the shortest column to let it catch
                 // up
-                if (currentState.minCol >= 0) {
+                if (currentState.minCol >= 0 && currentColumn == currentState.minCol) {
                     currentState.minCol = -1;
                 } else {
                     currentColumn = (currentColumn + 1) % 4;
@@ -99,6 +120,7 @@ function parseJSON(responseText) {
             }
 
             currentState.alreadyShown[fullname] = true;
+
         }
     }
 
