@@ -1,6 +1,7 @@
 var baseLink = "http://www.reddit.com";
 var lastFullname = "";
 var pendingRequest = false;
+var subredditSearchRequest;
 var minCol = -1;
 function sendRequest(subreddit) {
     pendingRequest = true;
@@ -12,7 +13,7 @@ function sendRequest(subreddit) {
     if (subreddit != '') {
         link = baseLink + "/r/" + encodeURIComponent(subreddit) + "/.json?limit=30&after=" + lastFullname;
     } else {
-        link = baseLink + "/.json?limit=25&after=" + lastFullname;
+        link = baseLink + "/.json?limit=20&after=" + lastFullname;
     }
     httprequest.open("GET", link, true);
     httprequest.send();
@@ -111,3 +112,34 @@ $(window).scroll(function() {
         }
     }
 });
+
+function gotoSubreddit(value,keyCode){
+    if(keyCode==13){
+        document.location = '/r/'+value;
+    }
+}
+function sendSubredditSearchRequest(value) {
+    if (value != '') {
+        if (subredditSearchRequest != null) {
+            subredditSearchRequest.abort();
+        } else {
+            subredditSearchRequest = new XMLHttpRequest();
+        }
+        var link = baseLink + "/api/subreddits_by_topic.json?query=" + encodeURIComponent(value);
+        subredditSearchRequest.open("GET", link, true);
+        subredditSearchRequest.send();
+        subredditSearchRequest.onreadystatechange = subredditSearchStateChangeHandler;
+    }
+}
+
+function subredditSearchStateChangeHandler() {
+    if (this.readyState == 4) {
+        if (this.status == 200) {
+            parseJSON(this.responseText);
+
+            $("#subredditSearcher").autocomplete({
+                source : availableTags
+            });
+        }
+    }
+}

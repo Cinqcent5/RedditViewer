@@ -19,6 +19,8 @@
 	<body>
 
 		<div id='subredditsBar'>
+			<input type='text' id='subredditSearcher' onkeydown='gotoSubreddit(this.value,event.keyCode)' placeholder='Goto subreddit'/>
+			<span class="separator">|</span>
 			<a class='subredditURL' href="{% url 'picviewer:default' %}">FRONT</a>
 			<span class="separator">-</span>
 			<a class='subredditURL' href="{% url 'picviewer:subreddit' 'all' %}">ALL</a>
@@ -37,7 +39,7 @@
 		</div>
 
 		<div class="centerWrapper">
-			<button id="loadMoreButton" onclick="sendRequest('{{subreddit}}')">
+			<button id="loadMoreButton" onclick='sendRequest("{{subreddit}}")'>
 				Load more
 			</button>
 			<img src="{% static 'picviewer/media/loading.gif' %}" id='loadingGif' alt='Loading...'>
