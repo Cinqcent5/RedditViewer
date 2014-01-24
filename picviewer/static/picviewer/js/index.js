@@ -60,7 +60,7 @@ function parseJSON(responseText) {
 
         var isPicture = false;
         var match;
-        if (( match = url.match(/(i\.imgur\.com\/[A-z0-9]{5,7})(\.(jpeg|jpg|gif|png|bmp))$/)) != null) {
+        if (( match = url.match(/(i\.imgur\.com\/[A-z0-9]{5,7})(\.(jpeg|jpg|png|bmp))$/)) != null) {
             // if it's an direct image url from imgur, we can limit the image size to 640x640
             // by adding 'l' to the end of the file hash
             thumbUrl = "http://" + match[1] + "l" + match[2];
