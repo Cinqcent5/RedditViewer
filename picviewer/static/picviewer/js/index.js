@@ -61,39 +61,44 @@ function parseJSON(responseText) {
         var title = data.title;
         var fullname = submissions[i].kind + "_" + data.id;
 
-        var url = data.url;
-        var thumbUrl = url;
-        var isPicture = false;
-        var match;
-        if (( match = url.match(/(i\.imgur\.com\/[A-z0-9]{5,7})(\.(jpeg|jpg|png|bmp))$/)) != null) {
-            // if it's an direct image url from imgur, we can limit the image
-            // size to 640x640
-            // by adding 'l' to the end of the file hash
-            thumbUrl = "http://" + match[1] + "l" + match[2];
-            isPicture = true;
-        } else if (( match = url.match(/imgur\.com\/([A-z0-9]{5,7})$/)) != null) {
-            // if it's an imgur url in the form of imgur.com/xxxxxxx , there
-            // will be a picture at
-            // i.imgur.com/xxxxxxxl.jpg that can be used for thumbnail
-            thumbUrl = "http://i.imgur.com/" + match[1] + "l.jpg";
-            isPicture = true;
-        } else if (url.match(/\.(jpeg|jpg|gif|png|bmp)$/) != null) {
-            isPicture = true;
-        }
-        // Only display the link if it's a image
-        if (isPicture) {
-            var containerHTML = "<ul class='imageContainer' id='" + fullname + "' onmouseover='displayOverlay(this,true)' onmouseout='displayOverlay(this,false)'>";
-            var imageHTML = "<a class='imageLink' href=" + url + " target=_blank><img class='image' src=" + thumbUrl + " width=" + width + "></a>";
-            var overlayHTML = "<span class='imageOverlay'><a class='permalink' href=" + currentState.baseLink + permalink + " target=_blank>" + title + "</a></span>";
-            document.getElementById("imageList" + currentColumn).innerHTML += containerHTML + imageHTML + overlayHTML + "</ul>";
-
-            // fill the first two images to the shortest column to let it catch
-            // up
-            if (currentState.minCol >= 0) {
-                currentState.minCol = -1;
-            } else {
-                currentColumn = (currentColumn + 1) % 4;
+        // Only display images that haven't been shown yet
+        if (!( fullname in currentState.alreadyShown)) {
+            var url = data.url;
+            var thumbUrl = url;
+            var isPicture = false;
+            var match;
+            if (( match = url.match(/(i\.imgur\.com\/[A-z0-9]{5,7})(\.(jpeg|jpg|png|bmp))$/)) != null) {
+                // if it's an direct image url from imgur, we can limit the image
+                // size to 640x640
+                // by adding 'l' to the end of the file hash
+                thumbUrl = "http://" + match[1] + "l" + match[2];
+                isPicture = true;
+            } else if (( match = url.match(/imgur\.com\/([A-z0-9]{5,7})$/)) != null) {
+                // if it's an imgur url in the form of imgur.com/xxxxxxx , there
+                // will be a picture at
+                // i.imgur.com/xxxxxxxl.jpg that can be used for thumbnail
+                thumbUrl = "http://i.imgur.com/" + match[1] + "l.jpg";
+                isPicture = true;
+            } else if (url.match(/\.(jpeg|jpg|gif|png|bmp)$/) != null) {
+                isPicture = true;
             }
+            // Only display the link if it's a image
+            if (isPicture) {
+                var containerHTML = "<ul class='imageContainer' id='" + fullname + "' onmouseover='displayOverlay(this,true)' onmouseout='displayOverlay(this,false)'>";
+                var imageHTML = "<a class='imageLink' href=" + url + " target=_blank><img class='image' src=" + thumbUrl + " width=" + width + "></a>";
+                var overlayHTML = "<span class='imageOverlay'><a class='permalink' href=" + currentState.baseLink + permalink + " target=_blank>" + title + "</a></span>";
+                document.getElementById("imageList" + currentColumn).innerHTML += containerHTML + imageHTML + overlayHTML + "</ul>";
+
+                // fill the first two images to the shortest column to let it catch
+                // up
+                if (currentState.minCol >= 0) {
+                    currentState.minCol = -1;
+                } else {
+                    currentColumn = (currentColumn + 1) % 4;
+                }
+            }
+
+            currentState.alreadyShown[fullname] = true;
         }
     }
 
