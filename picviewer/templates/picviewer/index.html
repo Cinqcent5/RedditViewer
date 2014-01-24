@@ -7,7 +7,9 @@
 	<head>
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js"></script>
 		<script type="text/javascript" src="{% static 'picviewer/js/index.js' %}"></script>
-
+		<script>
+			currentState = new CurrentState('{{subreddit}}');
+		</script>
 		<link type="text/css" rel="stylesheet" href="{% static 'picviewer/css/styles.css' %}" />
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<title>Reddit Picture Viewer</title>
@@ -47,8 +49,7 @@
 	</body>
 
 	<script>
-        var subreddit = '{{subreddit}}';
-        sendRequest(subreddit);
+		sendRequest();
 	</script>
 </html>
 

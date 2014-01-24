@@ -1,19 +1,25 @@
-var baseLink = "http://www.reddit.com";
-var lastFullname = "";
-var pendingRequest = false;
-var subredditSearchRequest;
-var minCol = -1;
-function sendRequest(subreddit) {
-    pendingRequest = true;
+function CurrentState(subreddit) {
+    this.baseLink = "http://www.reddit.com";
+    this.subreddit = subreddit;
+    this.lastFullname = "";
+    this.pendingRequest = false;
+    this.subredditSearchRequest = null;
+    this.minCol = -1;
+    this.alreadyShown = {};
+}
+
+function sendRequest() {
+    currentState.pendingRequest = true;
+    var limit = 15;
     $("#loadingGif").show();
     $("#loadMoreButton").hide();
 
     var httprequest = new XMLHttpRequest();
     var link;
-    if (subreddit != '') {
-        link = baseLink + "/r/" + encodeURIComponent(subreddit) + "/.json?limit=30&after=" + lastFullname;
+    if (currentState.subreddit != '') {
+        link = currentState.baseLink + "/r/" + encodeURIComponent(currentState.subreddit) + "/.json?limit=" + limit + "&after=" + currentState.lastFullname;
     } else {
-        link = baseLink + "/.json?limit=20&after=" + lastFullname;
+        link = currentState.baseLink + "/.json?limit=" + limit + "&after=" + currentState.lastFullname;
     }
     httprequest.open("GET", link, true);
     httprequest.send();
@@ -24,11 +30,11 @@ function sendRequest(subreddit) {
     for (var j = 1; j < 4; j++) {
         var curMin = document.getElementById("imageList" + j).offsetHeight;
         if (curMin < min) {
-            minCol = j;
+            currentState.minCol = j;
             min = curMin;
         }
     }
-}
+};
 
 function stateChangeHandlers() {
     if (this.readyState == 4) {
@@ -37,17 +43,17 @@ function stateChangeHandlers() {
         } else {
             alert("Connection Error\nStatus code: " + this.status + "\n" + this.responseText);
         }
-        pendingRequest = false;
+        currentState.pendingRequest = false;
         $("#loadingGif").hide();
         $("#loadMoreButton").show();
     }
-}
+};
 
 function parseJSON(responseText) {
     var width = 350;
     var responseJSON = JSON.parse(responseText);
     var submissions = responseJSON.data.children;
-    var currentColumn = minCol >= 0 ? minCol : 0;
+    var currentColumn = currentState.minCol >= 0 ? currentState.minCol : 0;
 
     for (var i = 0; i < submissions.length; i++) {
         var data = submissions[i].data;
@@ -57,16 +63,17 @@ function parseJSON(responseText) {
 
         var url = data.url;
         var thumbUrl = url;
-
         var isPicture = false;
         var match;
         if (( match = url.match(/(i\.imgur\.com\/[A-z0-9]{5,7})(\.(jpeg|jpg|png|bmp))$/)) != null) {
-            // if it's an direct image url from imgur, we can limit the image size to 640x640
+            // if it's an direct image url from imgur, we can limit the image
+            // size to 640x640
             // by adding 'l' to the end of the file hash
             thumbUrl = "http://" + match[1] + "l" + match[2];
             isPicture = true;
         } else if (( match = url.match(/imgur\.com\/([A-z0-9]{5,7})$/)) != null) {
-            // if it's an imgur url in the form of  imgur.com/xxxxxxx , there will be a picture at
+            // if it's an imgur url in the form of imgur.com/xxxxxxx , there
+            // will be a picture at
             // i.imgur.com/xxxxxxxl.jpg that can be used for thumbnail
             thumbUrl = "http://i.imgur.com/" + match[1] + "l.jpg";
             isPicture = true;
@@ -77,22 +84,23 @@ function parseJSON(responseText) {
         if (isPicture) {
             var containerHTML = "<ul class='imageContainer' id='" + fullname + "' onmouseover='displayOverlay(this,true)' onmouseout='displayOverlay(this,false)'>";
             var imageHTML = "<a class='imageLink' href=" + url + " target=_blank><img class='image' src=" + thumbUrl + " width=" + width + "></a>";
-            var overlayHTML = "<span class='imageOverlay'><a class='permalink' href=" + baseLink + permalink + " target=_blank>" + title + "</a></span>";
+            var overlayHTML = "<span class='imageOverlay'><a class='permalink' href=" + currentState.baseLink + permalink + " target=_blank>" + title + "</a></span>";
             document.getElementById("imageList" + currentColumn).innerHTML += containerHTML + imageHTML + overlayHTML + "</ul>";
 
-            // fill the first two images to the shortest column to let it catch up
-            if (minCol >= 0) {
-                minCol = -1;
+            // fill the first two images to the shortest column to let it catch
+            // up
+            if (currentState.minCol >= 0) {
+                currentState.minCol = -1;
             } else {
                 currentColumn = (currentColumn + 1) % 4;
             }
         }
     }
 
-    //return the fullname of the last submission fetched
+    // return the fullname of the last submission fetched
     var lastSubmission = submissions[submissions.length - 1];
-    lastFullname = lastSubmission.kind + "_" + lastSubmission.data.id;
-}
+    currentState.lastFullname = lastSubmission.kind + "_" + lastSubmission.data.id;
+};
 
 // Toggles the image overlay (title, comment link, etc) when the mouse
 // hovers over and when it moves out
@@ -102,22 +110,22 @@ function displayOverlay(obj, show) {
     } else {
         obj.lastChild.style.display = 'none';
     }
-}
+};
 
-
-$(window).scroll(function() {
-    if ($(window).scrollTop() + $(window).height() >= $(document).height() - 2) {
-        if (pendingRequest == false) {
-            sendRequest(subreddit);
+function scrollHandler() {
+    if ($(window).scrollTop() + $(window).height() >= $(document).height() - 500) {
+        if (currentState.pendingRequest == false) {
+            sendRequest(currentState.subreddit);
         }
     }
-});
+};
 
-function gotoSubreddit(value,keyCode){
-    if(keyCode==13){
-        document.location = '/r/'+value;
+function gotoSubreddit(value, keyCode) {
+    if (keyCode == 13) {
+        document.location = '/r/' + value;
     }
 }
+
 function sendSubredditSearchRequest(value) {
     if (value != '') {
         if (subredditSearchRequest != null) {
@@ -125,7 +133,7 @@ function sendSubredditSearchRequest(value) {
         } else {
             subredditSearchRequest = new XMLHttpRequest();
         }
-        var link = baseLink + "/api/subreddits_by_topic.json?query=" + encodeURIComponent(value);
+        var link = currentState.baseLink + "/api/subreddits_by_topic.json?query=" + encodeURIComponent(value);
         subredditSearchRequest.open("GET", link, true);
         subredditSearchRequest.send();
         subredditSearchRequest.onreadystatechange = subredditSearchStateChangeHandler;
@@ -143,3 +151,6 @@ function subredditSearchStateChangeHandler() {
         }
     }
 }
+
+
+$(window).scroll(scrollHandler);
