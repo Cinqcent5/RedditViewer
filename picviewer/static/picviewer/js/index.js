@@ -94,21 +94,24 @@ function parseJSON(responseText) {
             } else if (url.match(/\.(jpeg|jpg|gif|png|bmp)$/) != null) {
                 isPicture = true;
             }
+
             // Only display the link if it's a image
             if (isPicture) {
-
                 // If this is the max column, skip the first turn to let others catch up
                 if (currentState.maxCol >= 0 && currentColumn == currentState.maxCol) {
                     currentState.maxCol = -1;
                     currentColumn = (currentColumn + 1) % 4;
                 }
 
-                var containerHTML = "<ul class='imageContainer' id='" + fullname + "' onmouseover='displayOverlay(this,true)' onmouseout='displayOverlay(this,false)'>";
                 var imageHTML = "<a class='imageLink' href=" + url + " target=_blank><img class='image' src=" + thumbUrl + " width=" + width + "></a>";
                 var overlayHTML = "<span class='imageOverlay'><a class='permalink' href=" + currentState.baseLink + permalink + " target=_blank>" + title + "</a></span>";
-                document.getElementById("imageList" + currentColumn).innerHTML += containerHTML + imageHTML + overlayHTML + "</ul>";
-
-                // Column balancing
+                var node = document.createElement("ul");
+                node.setAttribute("class", "imageContainer");
+                node.setAttribute("id", fullname);
+                node.setAttribute("onmouseover", 'displayOverlay(this,true)');
+                node.setAttribute('onmouseout', 'displayOverlay(this,false)');
+                node.innerHTML = imageHTML + overlayHTML;
+                document.getElementById("imageList" + currentColumn).appendChild(node);
 
                 // fill the first two images to the shortest column to let it catch
                 // up
@@ -118,9 +121,7 @@ function parseJSON(responseText) {
                     currentColumn = (currentColumn + 1) % 4;
                 }
             }
-
             currentState.alreadyShown[fullname] = true;
-
         }
     }
 
@@ -140,7 +141,7 @@ function displayOverlay(obj, show) {
 };
 
 function scrollHandler() {
-    if ($(window).scrollTop() + $(window).height() >= $(document).height() - 500) {
+    if ($(window).scrollTop() + $(window).height() >= $(document).height() - 1500) {
         if (currentState.pendingRequest == false) {
             sendRequest(currentState.subreddit);
         }
