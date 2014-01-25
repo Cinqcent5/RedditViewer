@@ -2,11 +2,16 @@ function CurrentState(subreddit) {
     this.baseLink = "http://www.reddit.com";
     this.subreddit = subreddit;
     this.lastFullname = "";
+    this.backupLastFullname = "";
     this.pendingRequest = false;
     this.subredditSearchRequest = null;
     this.minCol = -1;
     this.maxCol = -1;
     this.alreadyShown = {};
+    this.numCols = Math.floor((window.innerWidth - 15) / 375);
+    if (this.numCols < 1) {
+        this.numCols = 1;
+    }
 }
 
 function sendRequest() {
@@ -29,7 +34,7 @@ function sendRequest() {
     // calculates the shortest and highest column
     var min = document.getElementById("imageList0").offsetHeight;
     var max = document.getElementById("imageList0").offsetHeight;
-    for (var j = 1; j < 4; j++) {
+    for (var j = 1; j < currentState.numCols; j++) {
         var curHeight = document.getElementById("imageList" + j).offsetHeight;
         if (curHeight < min) {
             currentState.minCol = j;
@@ -71,7 +76,7 @@ function parseJSON(responseText) {
         var data = submissions[i].data;
         var permalink = data.permalink;
         var title = data.title;
-        var fullname = submissions[i].kind + "_" + data.id;
+        var fullname = data.name;
 
         // Only display images that haven't been shown yet
         if (!( fullname in currentState.alreadyShown)) {
@@ -100,7 +105,7 @@ function parseJSON(responseText) {
                 // If this is the max column, skip the first turn to let others catch up
                 if (currentState.maxCol >= 0 && currentColumn == currentState.maxCol) {
                     currentState.maxCol = -1;
-                    currentColumn = (currentColumn + 1) % 4;
+                    currentColumn = (currentColumn + 1) % currentState.numCols;
                 }
 
                 var imageHTML = "<a class='imageLink' href=" + url + " target=_blank><img class='image' src=" + thumbUrl + " width=" + width + "></a>";
@@ -118,16 +123,22 @@ function parseJSON(responseText) {
                 if (currentState.minCol >= 0 && currentColumn == currentState.minCol) {
                     currentState.minCol = -1;
                 } else {
-                    currentColumn = (currentColumn + 1) % 4;
+                    currentColumn = (currentColumn + 1) % currentState.numCols;
                 }
             }
             currentState.alreadyShown[fullname] = true;
         }
     }
 
-    // return the fullname of the last submission fetched
-    var lastSubmission = submissions[submissions.length - 1];
-    currentState.lastFullname = lastSubmission.kind + "_" + lastSubmission.data.id;
+    // set the fullname of the last submission fetched
+    if (responseJSON.data.after != null) {
+        currentState.lastFullname = responseJSON.data.after;
+    }
+
+    // Get more images if there are not enough images fill the initial screen
+    if (document.body.offsetHeight < window.innerHeight) {
+        sendRequest(currentState.subreddit);
+    }
 };
 
 // Toggles the image overlay (title, comment link, etc) when the mouse

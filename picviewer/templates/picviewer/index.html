@@ -8,7 +8,7 @@
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js"></script>
 		<script type="text/javascript" src="{% static 'picviewer/js/index.js' %}"></script>
 		<script>
-			currentState = new CurrentState('{{subreddit}}');
+            currentState = new CurrentState('{{subreddit}}');
 		</script>
 		<link type="text/css" rel="stylesheet" href="{% static 'picviewer/css/styles.css' %}" />
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -35,11 +35,16 @@
 			{% endfor %}
 		</div>
 		<div id='gallery'>
-			{% for x in columns %}
-			<ul class='imageList' id='imageList{{ x }}'></ul>
-			{% endfor %}
+			<script>
+                for (var x = 0; x < currentState.numCols; x++) {
+                    document.write("<ul class='imageList' id='imageList" + x + "'></ul>");
+                }
+			</script>
 		</div>
 
+		<noscript>
+			Please enable javascript to use this site.
+		</noscript>
 		<div class="centerWrapper">
 			<button id="loadMoreButton" onclick='sendRequest("{{subreddit}}")'>
 				Load more
@@ -49,7 +54,7 @@
 	</body>
 
 	<script>
-		sendRequest();
+        sendRequest();
 	</script>
 </html>
 
