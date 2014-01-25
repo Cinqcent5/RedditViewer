@@ -6,9 +6,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 	<head>
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js"></script>
-		<script type="text/javascript" src="{% static 'picviewer/js/index.js' %}"></script>
+		<script type="text/javascript" src="{% static 'picviewer/js/main.js' %}"></script>
 		<script>
-            currentState = new CurrentState('{{subreddit}}');
+            currentState = new CurrentState("{{subreddit}}", "{{order}}");
 		</script>
 		<link type="text/css" rel="stylesheet" href="{% static 'picviewer/css/styles.css' %}" />
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -23,16 +23,31 @@
 		<div id='subredditsBar'>
 			<input type='text' id='subredditSearcher' onkeydown='gotoSubreddit(this.value,event.keyCode)' placeholder='Goto subreddit'/>
 			<span class="separator">|</span>
-			<a class='subredditURL' href="{% url 'picviewer:default' %}">FRONT</a>
+			<a class='subredditURL' href='{% url "picviewer:default" %}'>FRONT</a>
 			<span class="separator">-</span>
-			<a class='subredditURL' href="{% url 'picviewer:subreddit' 'all' %}">ALL</a>
+			<a class='subredditURL' href='{% url "picviewer:subreddit" "all" %}'>ALL</a>
 			<span class="separator">|</span>
 			{% for sr in subreddits %}
-			<a class='subredditURL' href="{% url 'picviewer:subreddit' sr %}">{{sr|upper}}</a>
+			<a class='subredditURL' href='{% url "picviewer:subreddit" sr   %}'>{{sr|upper}}</a>
 			{% if not forloop.last%}
 			<span class="separator">-</span>
 			{% endif %}
 			{% endfor %}
+		</div>
+		<div id='headerBar'>
+
+			<div id='sortBar'>
+				{% if subreddit == "" %}
+				{% for ord in orders %}
+				<a class='sortURL' id='sort{{ord}}' href='{% url "picviewer:sort" ord  %}'><span class='sortOrder'>{{ord}}</span></a>
+				{% endfor %}
+				{% else %}
+				{% for ord in orders %}
+				<a class='sortURL' id='sort{{ord}}' href='{% url "picviewer:full" subreddit ord  %}'><span class='sortOrder'>{{ord}}</span></a>
+				{% endfor %}
+				{% endif %}
+			</div>
+
 		</div>
 		<div id='gallery'>
 			<script>
@@ -50,11 +65,15 @@
 				Load more
 			</button>
 			<img src="{% static 'picviewer/media/loading.gif' %}" id='loadingGif' alt='Loading...'>
+			<p id='endNotification'>
+				There are no more links
+			</p>
 		</div>
 	</body>
 
 	<script>
-        sendRequest();
+        setup();
+
 	</script>
 </html>
 
