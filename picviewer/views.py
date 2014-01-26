@@ -6,11 +6,17 @@ def subredditSort(request, subreddit, order):
 def sort(request, order):
     return mainView(request, "", order)
 
+def subredditSearch(request, subreddit):
+    return mainView(request, subreddit, "")
+
 def subreddit(request, subreddit):
     return mainView(request, subreddit, "")
 
+
 def default(request):
     return mainView(request, "", "")
+
+
 
 def mainView(request, subreddit, order): 
     context = {}
@@ -19,11 +25,25 @@ def mainView(request, subreddit, order):
     context['subreddit'] = subreddit
     context['orders'] = ['hot', 'new', 'rising', 'controversial', 'top']
     context['order'] = order
-    context['topTimes'] = [['day', 'today'], ['hour', 'this hour'], ['week', 'this week'], ['month', 'this month'], ['year', 'this year'], ['all', 'all time']]
+    context['timeFrames'] = [['day', 'today'], ['hour', 'this hour'], ['week', 'this week'], ['month', 'this month'], ['year', 'this year'], ['all', 'all time']]
     if "t" in request.GET:
         context['topTime'] = request.GET["t"];
+        context['searchTime'] = request.GET["t"];
     else:
         context['topTime'] = "day";
+        context['searchTime'] = "all";
+    
+    context['searchOrders'] = ['relevance', 'hot', 'new', 'top'];
+    
+    if "sort" in request.GET:
+        context['searchOrder'] = request.GET["sort"];
+    else:
+        context['searchOrder'] = "relevance";
+        
+    if "q" in request.GET:
+        context['query'] = request.GET["q"];
+    else:
+        context['query'] = "";
     
     return render(request, 'picviewer/index.html', context)
 

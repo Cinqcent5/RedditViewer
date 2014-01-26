@@ -1,10 +1,14 @@
-function CurrentState(subreddit, order, topTime) {
+function CurrentState(subreddit, order, topTime, query, searchTime, searchOrder) {
     this.baseLink = "http://www.reddit.com";
+
     this.subreddit = subreddit;
     this.order = order;
     this.topTime = topTime;
+    this.query = query;
+    this.searchTime = searchTime;
+    this.searchOrder = searchOrder;
+
     this.lastFullname = "";
-    this.backupLastFullname = "";
     this.pendingRequest = false;
     this.subredditSearchRequest = null;
     this.minCol = -1;
@@ -15,6 +19,33 @@ function CurrentState(subreddit, order, topTime) {
         this.numCols = 1;
     }
 
+    var limit = 15;
+    // setup the starting url
+    //if query is empty, do a normal listing retrieval, otherwise do a search
+    if (query == "") {
+        var topTime = "";
+        if (this.order == "top") {
+            if (this.topTime == "") {
+                topTime = "&t=day";
+            } else {
+                topTime = "&t=" + this.topTime;
+            }
+        }
+        var postfix = "/" + this.order + ".json?limit=" + limit + this.lastFullname + topTime + "&after=";
+        if (this.subreddit != '') {
+            this.link = this.baseLink + "/r/" + encodeURIComponent(this.subreddit) + postfix;
+        } else {
+            this.link = this.baseLink + postfix;
+        }
+    } else {
+        var postfix = "/search.json?limit=" + limit + "&restrict_sr=on&q=" + this.query + "&t=" + this.searchTime + "&sort=" + this.searchOrder + "&after=";
+        if (this.subreddit != '') {
+            this.link = this.baseLink + "/r/" + encodeURIComponent(this.subreddit) + postfix;
+        } else {
+            this.link = this.baseLink + postfix;
+        }
+    }
+
 }
 
 function sendRequest() {
@@ -22,28 +53,12 @@ function sendRequest() {
         return;
     }
     currentState.pendingRequest = true;
-    var limit = 15;
     $("#loadingGif").show();
     $("#loadMoreButton").hide();
 
     var httprequest = new XMLHttpRequest();
-    var link;
-    var topTime = "";
-    if (currentState.order == "top") {
-        if (currentState.topTime == "") {
-            topTime = "&t=day";
-        } else {
-            topTime = "&t=" + currentState.topTime;
-        }
-    }
 
-    var postfix = "/" + currentState.order + ".json?limit=" + limit + "&after=" + currentState.lastFullname + topTime;
-    if (currentState.subreddit != '') {
-        link = currentState.baseLink + "/r/" + encodeURIComponent(currentState.subreddit) + postfix;
-    } else {
-        link = currentState.baseLink + postfix;
-    }
-    httprequest.open("GET", link, true);
+    httprequest.open("GET", currentState.link + currentState.lastFullname, true);
     httprequest.send();
     httprequest.onreadystatechange = stateChangeHandlers;
 
@@ -72,7 +87,7 @@ function sendRequest() {
 function stateChangeHandlers() {
     if (this.readyState == 4) {
         if (this.status == 200) {
-            currentState.pendingRequest = parseJSON(this.responseText);
+            parseJSON(this.responseText);
         } else {
             alert("Connection Error\nStatus code: " + this.status + "\n" + this.responseText);
             currentState.pendingRequest = false;
@@ -156,13 +171,13 @@ function parseJSON(responseText) {
     if (responseJSON.data.after != null) {
         currentState.lastFullname = responseJSON.data.after;
         // Get more images if there are not enough images fill the initial screen
+        currentState.pendingRequest = false;
         if (document.body.offsetHeight < window.innerHeight) {
-            sendRequest(currentState.subreddit);
+            sendRequest();
         }
-        return false;
     } else {
         $("#endNotification").show();
-        return true;
+        currentState.pendingRequest = true;
     }
 
 };
@@ -180,7 +195,19 @@ function displayOverlay(obj, show) {
 function setTopTime(obj) {
     var t = obj.options[obj.selectedIndex].value;
     document.location = "top?t=" + t;
+}
 
+function sendSearchRequest() {
+    var searchBox = document.getElementById("searchBox");
+    if (searchBox.value == "") {
+        return;
+    }
+    var searchTimeSelector = document.getElementById("searchTimeSelector");
+    var searchSortSelector = document.getElementById("searchSortSelector");
+    var t = searchTimeSelector.options[searchTimeSelector.selectedIndex].value;
+    var sort = searchSortSelector.options[searchSortSelector.selectedIndex].value;
+    var subreddit = currentState.subreddit == "" ? "" : "r/" + currentState.subreddit + "/";
+    document.location = "/" + subreddit + "search?q=" + searchBox.value + "&t=" + t + "&sort=" + sort;
 }
 
 function scrollHandler() {
@@ -188,6 +215,12 @@ function scrollHandler() {
         sendRequest(currentState.subreddit);
     }
 };
+
+function checkSearchBox(keyCode) {
+    if (keyCode == 13) {
+        sendSearchRequest();
+    }
+}
 
 function gotoSubreddit(value, keyCode) {
     if (keyCode == 13) {
@@ -224,13 +257,16 @@ function subredditSearchStateChangeHandler() {
 function setup() {
 
     //indicate the current sort order
-    if (currentState.order == "") {
-        document.getElementById("sorthot").className = "sortURLCurrent";
-    } else {
-        document.getElementById("sort" + currentState.order).className = "sortURLCurrent";
+    if (currentState.query == "") {
+        if (currentState.order == "") {
+            document.getElementById("sorthot").className = "sortURLCurrent";
+        } else {
+            document.getElementById("sort" + currentState.order).className = "sortURLCurrent";
+        }
     }
 
     $(window).scroll(scrollHandler);
+
     sendRequest();
 
 }

@@ -1,123 +1,152 @@
 body, div, span, ul, ol, li, img, a, select {
-	padding:0px;
-	margin:0px;
-	font:normal x-small verdana,arial,helvetica,sans-serif;
+	padding: 0px;
+	margin: 0px;
+	font: normal x-small verdana, arial, helvetica, sans-serif;
 }
 a {
-	text-decoration:none;
+	text-decoration: none;
 }
 body {
-	background-color:#FDFDFD;
+	background-color: #FDFDFD;
 }
 noscript {
-	display:block;
-	position:relative;
-	top:50px;
-	text-align:center;
+	display: block;
+	position: relative;
+	top: 50px;
+	text-align: center;
 }
+/* subreddit */
 #subredditsBar {
-	display:inline-block;
-	padding:2px 0px;
-	border-bottom:1px solid gray;
-	background-color:rgb(240, 240, 240);
-	width:100%;
+	display: inline-block;
+	padding: 2px 0px;
+	border-bottom: 1px solid gray;
+	background-color: rgb(240, 240, 240);
+	width: 100%;
 }
 #subredditsBar * {
-	color:black;
+	color: black;
 }
 #subredditSearcher {
-	margin-left:10px;
+	margin-left: 10px;
 }
+/* header */
 #headerBar {
-	width:100%;
-	background-color:#CEE3f8;
-	position:relative;
-	border-bottom:1px solid #5F99CF;
+	width: 100%;
+	background-color: #CEE3f8;
+	position: relative;
+	border-bottom: 1px solid #5F99CF;
 }
 
-#logo{
+#logo {
+	min-height: 40px;
 	margin-left: 5px;
 }
+/* sort */
 #sortBar {
 	display: inline-block;
-	padding-left:10px;
-	vertical-align:bottom;
+	padding-left: 10px;
+	vertical-align: bottom;
 }
 .sortURL {
-	padding:5px 5px 0px 5px;
-	border-bottom:1px solid #5F99CF;
-	background-color:#EFF7FF;
+	padding: 5px 5px 0px 5px;
+	border-bottom: 1px solid #5F99CF;
+	background-color: #EFF7FF;
 }
 .sortURLCurrent {
-	padding:5px 5px 0px 5px;
-	border:1px solid #5F99CF;
-	border-bottom-color:#FDFDFD;
-	background-color:#FDFDFD;
+	padding: 5px 5px 0px 5px;
+	border: 1px solid #5F99CF;
+	border-bottom-color: #FDFDFD;
+	background-color: #FDFDFD;
 }
 .sortOrder {
-	font-size:small;
-	font-weight:bold;
-	color:#369;
+	font-size: small;
+	font-weight: bold;
+	color: #369;
 }
 #topTimeSelector {
 	display: inline-block;
 }
+/* search */
+#searchBar {
+	float: right;
+	display: inline-block;
+}
+
+#searchBox {
+	display: block;
+}
+
+#searchButton {
+	float: right;
+	display: inline-block;
+	margin-right: 50px;
+}
+
+#searchOptions {
+	display: block;
+}
+/*gallery */
 #gallery {
-	position:relative;
-	list-style-type:none;
+	position: relative;
+	list-style-type: none;
 }
 .imageList {
-	display:inline-block;
-	vertical-align:top;
+	display: inline-block;
+	vertical-align: top;
 }
 .imageContainer {
-	margin:10px;
-	position:relative;
-	display:block;
-	border:solid 1px #ddd;
-	border-radius:2px;
-	-moz-box-shadow:2px 2px 2px #ccc;
-	-webkit-box-shadow:2px 2px 2px #ccc;
-	box-shadow:2px 2px 2px #eee;
+	margin: 10px;
+	position: relative;
+	display: block;
+	border: solid 1px #ddd;
+	border-radius: 2px;
+	-moz-box-shadow: 2px 2px 2px #ccc;
+	-webkit-box-shadow: 2px 2px 2px #ccc;
+	box-shadow: 2px 2px 2px #eee;
 }
 a.imageLink {
-	position:relative;
+	position: relative;
 }
 .image {
-	display:block;
+	display: block;
 }
 .permalink {
-	font-size:medium;
-	color:#333333;
+	font-size: medium;
+	color: #333333;
 }
 .permalink:visited {
-	color:#AAAAAA;
+	color: #AAAAAA;
 }
 .permalink:hover {
-	color:#006EB8;
+	color: #006EB8;
 }
 .imageOverlay {
-	display:none;
-	font-size:medium;
-	position:absolute;
-	bottom:0;
-	left:0;
-	word-wrap:break-word;
-	width:100%;
-	text-align:center;
-	padding-bottom:5px;
-	padding-top:5px;
-	background:rgb(255, 255, 255); /* The Fallback */
-	background:rgba(255, 255, 255, .95);
-	z-index:5;
+	display: none;
+	font-size: medium;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	word-wrap: break-word;
+	width: 100%;
+	text-align: center;
+	padding-bottom: 5px;
+	padding-top: 5px;
+	background: rgb(255, 255, 255); /* The Fallback */
+	background: rgba(255, 255, 255, .95);
+	z-index: 5;
 }
 .centerWrapper {
-	position:relative;
-	text-align:center;
+	position: relative;
+	text-align: center;
 }
-.centerWrapper * {
-	display:none;
+#loadMoreButton {
+	display: none;
+}
+
+#loadingGif {
+	display: none;
 }
 #endNotification {
-	font-size:large;
+	display: none;
+	font-size: large;
 }

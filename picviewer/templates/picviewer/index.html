@@ -8,7 +8,7 @@
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js"></script>
 		<script type="text/javascript" src="{% static 'picviewer/js/main.js' %}"></script>
 		<script>
-            currentState = new CurrentState("{{subreddit}}", "{{order}}", "{{topTime}}");
+            currentState = new CurrentState("{{subreddit}}", "{{order}}", "{{topTime}}", "{{query}}", "{{searchTime}}", "{{searchOrder}}");
 		</script>
 		<link type="text/css" rel="stylesheet" href="{% static 'picviewer/css/styles.css' %}" />
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -19,7 +19,6 @@
 		<!-- Date: 2014-01-22 -->
 	</head>
 	<body>
-		{{topTime}}
 		<noscript>
 			Please enable javascript to use this site.
 		</noscript>
@@ -55,13 +54,37 @@
 
 			{% if order == "top" %}
 			<select id="topTimeSelector" onchange=setTopTime(this)>
-				{% for t in topTimes %}
+				{% for t in timeFrames %}
 				<option class='topTimeOption'
 				{% if t.0 == topTime %} selected {% endif %}
 				value={{t.0}}>{{t.1}}</option>
 				{% endfor %}
 			</select>
 			{% endif %}
+
+			<button id="searchButton" onclick='sendSearchRequest()'>
+				Search
+			</button>
+			<div id='searchBar'>
+				<input type='text' id='searchBox' onkeydown='checkSearchBox(event.keyCode)' value="{{query}}" placeholder='Search'/>
+
+				<div id="searchOptions">
+					<select id="searchSortSelector">
+						{% for so in searchOrders %}
+						<option class='searchSortOption'
+						{% if so == searchOrder %} selected {% endif %}
+						value={{so}}>{{so}}</option>
+						{% endfor %}
+					</select>
+					<select id="searchTimeSelector">
+						{% for t in timeFrames %}
+						<option class='searchTimeOption'
+						{% if t.0 == searchTime %} selected {% endif %}
+						value={{t.0}}>{{t.1}}</option>
+						{% endfor %}
+					</select>
+				</div>
+			</div>
 		</div>
 
 		<div id='gallery'>
@@ -85,7 +108,6 @@
 
 	<script>
         setup();
-
 	</script>
 </html>
 
