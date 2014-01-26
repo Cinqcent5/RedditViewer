@@ -12,13 +12,20 @@
 		</script>
 		<link type="text/css" rel="stylesheet" href="{% static 'picviewer/css/styles.css' %}" />
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+		{% if name != "" %}
+		<title>r/{{subreddit}} | Reddit Picture Viewer</title>
+		{% else %}
 		<title>Reddit Picture Viewer</title>
+		{% endif %}
+
 		<meta name="author" content="David Zou" />
 		<meta name="description" content="Website to quickly view pictures/gifs from Reddit">
 		<meta name="keywords" content="reddit, pictures, cats">
 		<!-- Date: 2014-01-22 -->
 	</head>
 	<body>
+
 		<noscript>
 			Please enable javascript to use this site.
 		</noscript>
@@ -39,7 +46,8 @@
 		</div>
 
 		<div id='headerBar'>
-			<img id='logo' src='http://b.thumbs.redditmedia.com/harEHsUUZVajabtC.png'>
+			<a id='logoLink' href='{{link}}' target="_blank"><img id='logo' src='{{image}}'></a>
+			<a id='logoLink' href='{{link}}' target="_blank"><span id='subredditName'>{{name}}</span></a>
 			<div id='sortBar'>
 				{% if subreddit == "" %}
 				{% for ord in orders %}

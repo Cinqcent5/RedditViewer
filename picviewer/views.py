@@ -1,4 +1,6 @@
 from django.shortcuts import render
+import json
+import urllib2
 
 def subredditSort(request, subreddit, order):
     return mainView(request, subreddit, order);
@@ -44,6 +46,22 @@ def mainView(request, subreddit, order):
         context['query'] = request.GET["q"];
     else:
         context['query'] = "";
-    
+        
+    if(subreddit == ""):
+        context['image'] = "http://b.thumbs.redditmedia.com/harEHsUUZVajabtC.png"
+        context['link'] = "http://www.reddit.com";
+        context['name'] = "";
+    else:
+        try:
+            h1 = urllib2.urlopen("http://www.reddit.com/r/" + subreddit + "/about.json", timeout=5)
+            jsonObj=json.loads(h1.read());
+            context['image'] = jsonObj["data"]["header_img"]
+            context['link'] = "http://www.reddit.com/r/" + subreddit;
+            context['name'] = jsonObj["data"]["display_name"];
+        except Exception:
+            context['image'] = "http://b.thumbs.redditmedia.com/harEHsUUZVajabtC.png"
+            context['link'] = "http://www.reddit.com";
+            context['name'] = "";
+        
     return render(request, 'picviewer/index.html', context)
 

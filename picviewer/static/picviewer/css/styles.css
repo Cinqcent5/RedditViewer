@@ -15,6 +15,7 @@ noscript {
 	top: 50px;
 	text-align: center;
 }
+
 /* subreddit */
 #subredditsBar {
 	display: inline-block;
@@ -29,6 +30,7 @@ noscript {
 #subredditSearcher {
 	margin-left: 10px;
 }
+
 /* header */
 #headerBar {
 	width: 100%;
@@ -36,11 +38,20 @@ noscript {
 	position: relative;
 	border-bottom: 1px solid #5F99CF;
 }
-
 #logo {
-	min-height: 40px;
+	height: 40px;
 	margin-left: 5px;
 }
+#subredditName {
+	font-size: large;
+}
+#logoLink {
+	color: #333333;
+}
+#logoLink:hover {
+	color: #369;
+}
+
 /* sort */
 #sortBar {
 	display: inline-block;
@@ -66,6 +77,7 @@ noscript {
 #topTimeSelector {
 	display: inline-block;
 }
+
 /* search */
 #searchBar {
 	float: right;
@@ -85,6 +97,7 @@ noscript {
 #searchOptions {
 	display: block;
 }
+
 /*gallery */
 #gallery {
 	position: relative;
@@ -118,7 +131,7 @@ a.imageLink {
 	color: #AAAAAA;
 }
 .permalink:hover {
-	color: #006EB8;
+	color: #369;
 }
 .imageOverlay {
 	display: none;
