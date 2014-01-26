@@ -1,7 +1,8 @@
-function CurrentState(subreddit, order) {
+function CurrentState(subreddit, order, topTime) {
     this.baseLink = "http://www.reddit.com";
     this.subreddit = subreddit;
     this.order = order;
+    this.topTime = topTime;
     this.lastFullname = "";
     this.backupLastFullname = "";
     this.pendingRequest = false;
@@ -27,7 +28,16 @@ function sendRequest() {
 
     var httprequest = new XMLHttpRequest();
     var link;
-    var postfix = "/" + currentState.order + ".json?limit=" + limit + "&after=" + currentState.lastFullname;
+    var topTime = "";
+    if (currentState.order == "top") {
+        if (currentState.topTime == "") {
+            topTime = "&t=day";
+        } else {
+            topTime = "&t=" + currentState.topTime;
+        }
+    }
+
+    var postfix = "/" + currentState.order + ".json?limit=" + limit + "&after=" + currentState.lastFullname + topTime;
     if (currentState.subreddit != '') {
         link = currentState.baseLink + "/r/" + encodeURIComponent(currentState.subreddit) + postfix;
     } else {
@@ -166,6 +176,12 @@ function displayOverlay(obj, show) {
         obj.lastChild.style.display = 'none';
     }
 };
+
+function setTopTime(obj) {
+    var t = obj.options[obj.selectedIndex].value;
+    document.location = "top?t=" + t;
+
+}
 
 function scrollHandler() {
     if ($(window).scrollTop() + $(window).height() >= $(document).height() - 1500) {

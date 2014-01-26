@@ -1,4 +1,4 @@
-body, div, span, ul, ol, li, img, a {
+body, div, span, ul, ol, li, img, a, select {
 	padding:0px;
 	margin:0px;
 	font:normal x-small verdana,arial,helvetica,sans-serif;
@@ -16,6 +16,7 @@ noscript {
 	text-align:center;
 }
 #subredditsBar {
+	display:inline-block;
 	padding:2px 0px;
 	border-bottom:1px solid gray;
 	background-color:rgb(240, 240, 240);
@@ -31,14 +32,16 @@ noscript {
 	width:100%;
 	background-color:#CEE3f8;
 	position:relative;
-	height:30px;
-	padding:5px 0px;
 	border-bottom:1px solid #5F99CF;
 }
+
+#logo{
+	margin-left: 5px;
+}
 #sortBar {
-	position:absolute;
+	display: inline-block;
 	padding-left:10px;
-	bottom:0px;
+	vertical-align:bottom;
 }
 .sortURL {
 	padding:5px 5px 0px 5px;
@@ -55,6 +58,9 @@ noscript {
 	font-size:small;
 	font-weight:bold;
 	color:#369;
+}
+#topTimeSelector {
+	display: inline-block;
 }
 #gallery {
 	position:relative;
