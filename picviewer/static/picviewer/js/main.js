@@ -14,6 +14,7 @@ function CurrentState(subreddit, order, topTime, query, searchTime, searchOrder)
     this.minCol = -1;
     this.maxCol = -1;
     this.alreadyShown = {};
+    this.sendCount = 0;
     this.numCols = Math.floor((window.innerWidth - 15) / 375);
     if (this.numCols < 1) {
         this.numCols = 1;
@@ -53,6 +54,7 @@ function sendRequest() {
         return;
     }
     currentState.pendingRequest = true;
+    currentState.sendCount++;
     $("#loadingGif").show();
     $("#loadMoreButton").hide();
 
@@ -86,6 +88,7 @@ function sendRequest() {
 
 function stateChangeHandlers() {
     if (this.readyState == 4) {
+        $("#loadingGif").hide();
         if (this.status == 200) {
             parseJSON(this.responseText);
         } else {
@@ -93,13 +96,11 @@ function stateChangeHandlers() {
             currentState.pendingRequest = false;
         }
 
-        $("#loadingGif").hide();
         if (currentState.pendingRequest) {
             $("#loadMoreButton").hide();
         } else {
             $("#loadMoreButton").show();
         }
-
     }
 };
 
@@ -145,15 +146,36 @@ function parseJSON(responseText) {
                     currentColumn = (currentColumn + 1) % currentState.numCols;
                 }
 
-                var imageHTML = "<a class='imageLink' href=" + url + " target=_blank><img class='image' src=" + thumbUrl + " width=" + width + "></a>";
-                var overlayHTML = "<span class='imageOverlay'><a class='permalink' href=" + currentState.baseLink + permalink + " target=_blank>" + title + "</a></span>";
-                var node = document.createElement("ul");
-                node.setAttribute("class", "imageContainer");
-                node.setAttribute("id", fullname);
-                node.setAttribute("onmouseover", 'displayOverlay(this,true)');
-                node.setAttribute('onmouseout', 'displayOverlay(this,false)');
-                node.innerHTML = imageHTML + overlayHTML;
-                document.getElementById("imageList" + currentColumn).appendChild(node);
+                var imageNode = document.createElement("img");
+                imageNode.setAttribute("class", "image");
+                imageNode.setAttribute("src", thumbUrl);
+                imageNode.setAttribute("width", width);
+
+                var imageLinkNode = document.createElement("a");
+                imageLinkNode.setAttribute("class", "imageLink");
+                imageLinkNode.setAttribute("href", url);
+                imageLinkNode.setAttribute("target", "_blank");
+                imageLinkNode.appendChild(imageNode);
+
+                var permalinkNode = document.createElement("a");
+                permalinkNode.setAttribute("class", "permalink");
+                permalinkNode.setAttribute("href", currentState.baseLink + permalink);
+                permalinkNode.setAttribute("target", "_blank");
+                permalinkNode.innerHTML = title;
+
+                var overlayNode = document.createElement("div");
+                overlayNode.setAttribute("class", "imageOverlay");
+                overlayNode.appendChild(permalinkNode);
+
+                var imageContainerNode = document.createElement("ul");
+                imageContainerNode.setAttribute("class", "imageContainer");
+                imageContainerNode.setAttribute("id", fullname);
+                imageContainerNode.setAttribute("onmouseover", 'displayOverlay(this,true)');
+                imageContainerNode.setAttribute('onmouseout', 'displayOverlay(this,false)');
+                imageContainerNode.appendChild(imageNode);
+                imageContainerNode.appendChild(overlayNode);
+
+                document.getElementById("imageList" + currentColumn).appendChild(imageContainerNode);
 
                 // fill the first two images to the shortest column to let it catch
                 // up
@@ -172,7 +194,7 @@ function parseJSON(responseText) {
         currentState.lastFullname = responseJSON.data.after;
         // Get more images if there are not enough images fill the initial screen
         currentState.pendingRequest = false;
-        if (document.body.offsetHeight < window.innerHeight) {
+        if (currentState.sendCount <= 10 && document.body.offsetHeight < window.innerHeight) {
             sendRequest();
         }
     } else {
