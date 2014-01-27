@@ -205,6 +205,7 @@ a.imageLink {
 	display: none;
 }
 #endNotification {
+	padding: 5px;
 	display: none;
 	font-size: large;
 }

@@ -106,13 +106,14 @@
 		</div>
 
 		<div class="centerWrapper">
+			<div id='endNotification'>
+				There are no more links
+			</div>
 			<button id="loadMoreButton" onclick='sendRequest("{{subreddit}}")'>
 				Load more
 			</button>
 			<img src="{% static 'picviewer/media/loading.gif' %}" id='loadingGif' alt='Loading...'>
-			<p id='endNotification'>
-				There are no more links
-			</p>
+
 		</div>
 	</body>
 

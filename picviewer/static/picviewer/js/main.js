@@ -91,6 +91,10 @@ function stateChangeHandlers() {
         $("#loadingGif").hide();
         if (this.status == 200) {
             parseJSON(this.responseText);
+        } else if (this.status == 0) {
+            currentState.pendingRequest = false;
+            document.getElementById("endNotification").innerHTML = "This subreddit likely does not exist";
+            $("#endNotification").show();
         } else {
             alert("Connection Error\nStatus code: " + this.status + "\n" + this.responseText);
             currentState.pendingRequest = false;
@@ -159,19 +163,19 @@ function parseJSON(responseText) {
                 imageLinkNode.appendChild(imageNode);
 
                 //Overlays
-                var voteNode  =document.createElement("span");
-                voteNode.setAttribute("class","voteCount");
-                voteNode.innerHTML=data.score+" pts";
-                
-                var commentNode  =document.createElement("span");
-                commentNode.setAttribute("class","commentCount");
-                commentNode.innerHTML=data.num_comments+" comments";
-                
-                var countContainer=document.createElement("div");
-                countContainer.setAttribute("class","countContainer");
+                var voteNode = document.createElement("span");
+                voteNode.setAttribute("class", "voteCount");
+                voteNode.innerHTML = data.score + " pts";
+
+                var commentNode = document.createElement("span");
+                commentNode.setAttribute("class", "commentCount");
+                commentNode.innerHTML = data.num_comments + " comments";
+
+                var countContainer = document.createElement("div");
+                countContainer.setAttribute("class", "countContainer");
                 countContainer.appendChild(voteNode);
                 countContainer.appendChild(commentNode);
-                
+
                 var permalinkNode = document.createElement("a");
                 permalinkNode.setAttribute("class", "permalink");
                 permalinkNode.setAttribute("href", currentState.baseLink + permalink);
