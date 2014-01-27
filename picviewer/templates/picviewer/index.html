@@ -43,11 +43,13 @@
 			<span class="separator">-</span>
 			{% endif %}
 			{% endfor %}
+
+			<a id="sourceCode" href="https://github.com/f2rf2r/RedditPicViewer" target="_blank">Source code</a>
 		</div>
 
 		<div id='headerBar'>
-			<a id='logoLink' href='{{link}}' target="_blank"><img id='logo' src='{{image}}'></a>
-			<a id='logoLink' href='{{link}}' target="_blank"><span id='subredditName'>{{name}}</span></a>
+			<a class='logoLink' href='{{link}}' target="_blank"><img id='logo' src='{{image}}'></a>
+			<a class='logoLink' href='{{link}}' target="_blank"><span id='subredditName'>{{name}}</span></a>
 			<div id='sortBar'>
 				{% if subreddit == "" %}
 				{% for ord in orders %}

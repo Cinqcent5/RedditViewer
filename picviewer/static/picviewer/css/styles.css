@@ -24,11 +24,18 @@ noscript {
 	background-color: rgb(240, 240, 240);
 	width: 100%;
 }
-#subredditsBar * {
+.subredditURL, .separator {
 	color: black;
 }
 #subredditSearcher {
 	margin-left: 10px;
+}
+
+#sourceCode {
+	margin-right: 10px;
+	font-size: medium;
+	float: right;
+	color: #369;
 }
 
 /* header */
@@ -45,10 +52,10 @@ noscript {
 #subredditName {
 	font-size: large;
 }
-#logoLink {
+.logoLink {
 	color: #333333;
 }
-#logoLink:hover {
+.logoLink:hover {
 	color: #369;
 }
 
@@ -74,6 +81,7 @@ noscript {
 	font-weight: bold;
 	color: #369;
 }
+
 #topTimeSelector {
 	display: inline-block;
 }
@@ -111,28 +119,20 @@ noscript {
 	margin: 10px;
 	position: relative;
 	display: block;
-	border: solid 1px #ddd;
-	border-radius: 2px;
-	-moz-box-shadow: 2px 2px 2px #ccc;
-	-webkit-box-shadow: 2px 2px 2px #ccc;
+	border: solid 1px #bbb;
+	-moz-box-shadow: 2px 2px 2px #eee;
+	-webkit-box-shadow: 2px 2px 2px #eee;
 	box-shadow: 2px 2px 2px #eee;
 }
 a.imageLink {
 	position: relative;
 }
 .image {
+	border-radius: 3px;
 	display: block;
 }
-.permalink {
-	font-size: medium;
-	color: #333333;
-}
-.permalink:visited {
-	color: #AAAAAA;
-}
-.permalink:hover {
-	color: #369;
-}
+
+/* overlay */
 .imageOverlay {
 	display: none;
 	font-size: medium;
@@ -145,9 +145,52 @@ a.imageLink {
 	padding-bottom: 5px;
 	padding-top: 5px;
 	background: rgb(255, 255, 255); /* The Fallback */
-	background: rgba(255, 255, 255, .95);
+	background: rgba(255, 255, 255, .97);
 	z-index: 5;
 }
+
+.imageOverlay a {
+	color: #333333;
+}
+.imageOverlay a:visited {
+	color: #AAAAAA;
+}
+.imageOverlay a:hover {
+	color: #369;
+}
+
+.countContainer {
+	padding: 0px 5px;
+	display: block;
+}
+.voteCount {
+	display: inline-block;
+	width: 50%;
+	text-align: left;
+}
+.commentCount {
+	display: inline-block;
+	width: 50%;
+	text-align: right;
+}
+
+.permalink {
+	font-family: Arial, serif;
+	padding: 3px;
+	display: block;
+	font-size: medium;
+}
+
+.author {
+	float: left;
+	padding-left: 5px;
+}
+.imageSubreddit {
+	float: right;
+	padding-right: 5px;
+}
+
+/* Bottom */
 .centerWrapper {
 	position: relative;
 	text-align: center;

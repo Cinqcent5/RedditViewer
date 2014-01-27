@@ -146,6 +146,7 @@ function parseJSON(responseText) {
                     currentColumn = (currentColumn + 1) % currentState.numCols;
                 }
 
+                //image
                 var imageNode = document.createElement("img");
                 imageNode.setAttribute("class", "image");
                 imageNode.setAttribute("src", thumbUrl);
@@ -157,16 +158,46 @@ function parseJSON(responseText) {
                 imageLinkNode.setAttribute("target", "_blank");
                 imageLinkNode.appendChild(imageNode);
 
+                //Overlays
+                var voteNode  =document.createElement("span");
+                voteNode.setAttribute("class","voteCount");
+                voteNode.innerHTML=data.score+" pts";
+                
+                var commentNode  =document.createElement("span");
+                commentNode.setAttribute("class","commentCount");
+                commentNode.innerHTML=data.num_comments+" comments";
+                
+                var countContainer=document.createElement("div");
+                countContainer.setAttribute("class","countContainer");
+                countContainer.appendChild(voteNode);
+                countContainer.appendChild(commentNode);
+                
                 var permalinkNode = document.createElement("a");
                 permalinkNode.setAttribute("class", "permalink");
                 permalinkNode.setAttribute("href", currentState.baseLink + permalink);
                 permalinkNode.setAttribute("target", "_blank");
                 permalinkNode.innerHTML = title;
 
+                var authorNode = document.createElement("a");
+                authorNode.setAttribute("class", "author");
+                authorNode.setAttribute("href", "http://reddit.com/u/" + data.author);
+                authorNode.setAttribute("target", "_blank");
+                authorNode.innerHTML = "u/" + data.author;
+
+                var subredditNode = document.createElement("a");
+                subredditNode.setAttribute("class", "imageSubreddit");
+                subredditNode.setAttribute("href", "/r/" + data.subreddit);
+                subredditNode.setAttribute("target", "_blank");
+                subredditNode.innerHTML = "r/" + data.subreddit;
+
                 var overlayNode = document.createElement("div");
                 overlayNode.setAttribute("class", "imageOverlay");
+                overlayNode.appendChild(countContainer);
                 overlayNode.appendChild(permalinkNode);
+                overlayNode.appendChild(authorNode);
+                overlayNode.appendChild(subredditNode);
 
+                //Container
                 var imageContainerNode = document.createElement("ul");
                 imageContainerNode.setAttribute("class", "imageContainer");
                 imageContainerNode.setAttribute("id", fullname);
