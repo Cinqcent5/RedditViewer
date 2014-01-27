@@ -119,6 +119,7 @@ noscript {
 	margin: 10px;
 	position: relative;
 	display: block;
+	border-radius: 4px;
 	border: solid 1px #bbb;
 	-moz-box-shadow: 2px 2px 2px #eee;
 	-webkit-box-shadow: 2px 2px 2px #eee;
@@ -145,8 +146,9 @@ a.imageLink {
 	padding-bottom: 5px;
 	padding-top: 5px;
 	background: rgb(255, 255, 255); /* The Fallback */
-	background: rgba(255, 255, 255, .97);
+	background: rgba(255, 255, 255, .96);
 	z-index: 5;
+	border-radius: 0 0 3px 3px;
 }
 
 .imageOverlay a {

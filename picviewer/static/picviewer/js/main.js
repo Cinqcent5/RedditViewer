@@ -203,7 +203,7 @@ function parseJSON(responseText) {
                 imageContainerNode.setAttribute("id", fullname);
                 imageContainerNode.setAttribute("onmouseover", 'displayOverlay(this,true)');
                 imageContainerNode.setAttribute('onmouseout', 'displayOverlay(this,false)');
-                imageContainerNode.appendChild(imageNode);
+                imageContainerNode.appendChild(imageLinkNode);
                 imageContainerNode.appendChild(overlayNode);
 
                 document.getElementById("imageList" + currentColumn).appendChild(imageContainerNode);
