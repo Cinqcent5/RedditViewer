@@ -1,12 +1,13 @@
-function CurrentState(subreddit, order, topTime, query, searchTime, searchOrder) {
+function CurrentState(subreddit, order, timeFrame, query, searchTime, searchOrder, user) {
     this.baseLink = "http://www.reddit.com";
 
     this.subreddit = subreddit;
     this.order = order;
-    this.topTime = topTime;
+    this.timeFrame = timeFrame;
     this.query = query;
     this.searchTime = searchTime;
     this.searchOrder = searchOrder;
+    this.user = user;
 
     this.lastFullname = "";
     this.pendingRequest = false;
@@ -22,24 +23,37 @@ function CurrentState(subreddit, order, topTime, query, searchTime, searchOrder)
 
     var limit = 15;
     // setup the starting url
-    //if query is empty, do a normal listing retrieval, otherwise do a search
-    if (query == "") {
-        var topTime = "";
-        if (this.order == "top") {
-            if (this.topTime == "") {
-                topTime = "&t=day";
+    if (user != "") {
+        // listing of user submissions
+        var timeFrameQuery = "";
+        if (this.order == "top" || this.order == "controversial") {
+            if (this.timeFrame == "") {
+                timeFrameQuery = "&t=day";
             } else {
-                topTime = "&t=" + this.topTime;
+                timeFrameQuery = "&t=" + this.timeFrame;
             }
         }
-        var postfix = "/" + this.order + ".json?limit=" + limit + this.lastFullname + topTime + "&after=";
+        var postfix = "/user/" + this.user + "/submitted/.json?limit=" + limit + "&sort=" + this.order + timeFrameQuery + "&after=";
+        this.link = this.baseLink + postfix;
+    } else if (query != "") {
+        // search
+        var postfix = "/search.json?limit=" + limit + "&restrict_sr=on&q=" + this.query + "&t=" + this.searchTime + "&sort=" + this.searchOrder + "&after=";
         if (this.subreddit != '') {
             this.link = this.baseLink + "/r/" + encodeURIComponent(this.subreddit) + postfix;
         } else {
             this.link = this.baseLink + postfix;
         }
     } else {
-        var postfix = "/search.json?limit=" + limit + "&restrict_sr=on&q=" + this.query + "&t=" + this.searchTime + "&sort=" + this.searchOrder + "&after=";
+        // normal/subreddit listing retrieval
+        var timeFrameQuery = "";
+        if (this.order == "top" || this.order == "controversial") {
+            if (this.timeFrame == "") {
+                timeFrameQuery = "&t=day";
+            } else {
+                timeFrameQuery = "&t=" + this.timeFrame;
+            }
+        }
+        var postfix = "/" + this.order + ".json?limit=" + limit + timeFrameQuery + "&after=";
         if (this.subreddit != '') {
             this.link = this.baseLink + "/r/" + encodeURIComponent(this.subreddit) + postfix;
         } else {
@@ -185,7 +199,7 @@ function parseJSON(responseText) {
 
                 var authorNode = document.createElement("a");
                 authorNode.setAttribute("class", "author");
-                authorNode.setAttribute("href", "http://reddit.com/u/" + data.author);
+                authorNode.setAttribute("href", "/u/" + data.author);
                 authorNode.setAttribute("target", "_blank");
                 authorNode.innerHTML = "u/" + data.author;
 
@@ -250,9 +264,9 @@ function displayOverlay(obj, show) {
     }
 };
 
-function setTopTime(obj) {
+function setTimeFrame(obj) {
     var t = obj.options[obj.selectedIndex].value;
-    document.location = "top?t=" + t;
+    document.location = currentState.order + "?t=" + t;
 }
 
 function sendSearchRequest() {

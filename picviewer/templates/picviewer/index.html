@@ -7,18 +7,20 @@
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js"></script>
 		<script type="text/javascript" src="{% static 'picviewer/js/main.js' %}"></script>
 		<script>
-            currentState = new CurrentState("{{subreddit}}", "{{order}}", "{{topTime}}", "{{query}}", "{{searchTime}}", "{{searchOrder}}");
+            currentState = new CurrentState("{{subreddit}}", "{{order}}", "{{timeFrame}}", "{{query}}", "{{searchTime}}", "{{searchOrder}}", "{{user}}");
 		</script>
 		<link type="text/css" rel="stylesheet" href="{% static 'picviewer/css/styles.css' %}" />
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-		{% if name != "" %}
-		<title>r/{{subreddit}} | Reddit Picture Viewer</title>
+		{% if user != "" %}
+		<title>u/{{user}} | Reddit Picture Viewer</title>
+		{% elif name != "" %}
+		<title>r/{{name}} | Reddit Picture Viewer</title>
 		{% else %}
 		<title>Reddit Picture Viewer</title>
 		{% endif %}
 
-		<meta name="author" content="David Zou" />
+		<meta name="author" content="David Zou">
 		<meta name="description" content="Website to quickly view pictures/gifs from Reddit">
 		<meta name="keywords" content="reddit, pictures, cats">
 		<!-- Date: 2014-01-22 -->
@@ -43,24 +45,32 @@
 
 		<header id='headerBar'>
 			<a class='logoLink' href='{{link}}' target="_blank"><img id='logo' src='{{image}}' alt="logo"></a>
+			{% if user != "" %}
+			<a class='logoLink' href='http://www.reddit.com/u/{{user}}' target="_blank"><span id='userName'>u/{{user}}</span></a>
+			{% else %}
 			<a class='logoLink' href='{{link}}' target="_blank"><span id='subredditName'>{{name}}</span></a>
+			{% endif %}
 			<nav id='sortBar'>
-				{% if subreddit == "" %}
+				{% if user != "" %}
+				{% for ord in userOrders %}
+				<a class='sortURL' id='sort{{ord}}' href='{% url "picviewer:userSort" user ord  %}'><span class='sortOrder'>{{ord}}</span></a>
+				{% endfor %}
+				{% elif subreddit != "" %}
 				{% for ord in orders %}
-				<a class='sortURL' id='sort{{ord}}' href='{% url "picviewer:sort" ord  %}'><span class='sortOrder'>{{ord}}</span></a>
+				<a class='sortURL' id='sort{{ord}}' href='{% url "picviewer:subredditSort" subreddit ord  %}'><span class='sortOrder'>{{ord}}</span></a>
 				{% endfor %}
 				{% else %}
 				{% for ord in orders %}
-				<a class='sortURL' id='sort{{ord}}' href='{% url "picviewer:subredditSort" subreddit ord  %}'><span class='sortOrder'>{{ord}}</span></a>
+				<a class='sortURL' id='sort{{ord}}' href='{% url "picviewer:sort" ord  %}'><span class='sortOrder'>{{ord}}</span></a>
 				{% endfor %}
 				{% endif %}
 			</nav>
 
-			{% if order == "top" %}
-			<select id="topTimeSelector" onchange=setTopTime(this)>
+			{% if order == "top" or order == "controversial" %}
+			<select id="timeFrameSelector" onchange=setTimeFrame(this)>
 				{% for t in timeFrames %}
-				<option class='topTimeOption'
-				{% if t.0 == topTime %} selected {% endif %}
+				<option class='timeFrameOption'
+				{% if t.0 == timeFrame %} selected {% endif %}
 				value={{t.0}}>{{t.1}}</option>
 				{% endfor %}
 			</select>
