@@ -195,7 +195,7 @@ function parseJSON(responseText) {
 
                 var permalinkNode = document.createElement("a");
                 permalinkNode.setAttribute("class", "permalink");
-                permalinkNode.setAttribute("href", currentState.baseLink + permalink);
+                permalinkNode.setAttribute("href", url);
                 permalinkNode.setAttribute("target", "_blank");
                 permalinkNode.innerHTML = title;
 
