@@ -1,4 +1,4 @@
-body, div, span, ul, ol, li, img, a, select, p {
+body, div, span, ul, ol, li, img, a, select, p, article, header, nav, section {
 	padding: 0px;
 	margin: 0px;
 	font: normal x-small verdana, arial, helvetica, sans-serif;
@@ -162,6 +162,7 @@ a.imageLink {
 }
 
 .countContainer {
+	font-size: small;
 	padding: 0px 5px;
 	display: block;
 }
