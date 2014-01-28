@@ -193,7 +193,7 @@ a.imageLink {
 }
 
 /* Bottom */
-.centerWrapper {
+#indicator {
 	position: relative;
 	text-align: center;
 }

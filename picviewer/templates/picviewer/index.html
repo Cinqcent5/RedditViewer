@@ -1,5 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
-"http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html>
 
 {% load staticfiles %}
 
@@ -25,12 +24,7 @@
 		<!-- Date: 2014-01-22 -->
 	</head>
 	<body>
-
-		<noscript>
-			Please enable javascript to use this site.
-		</noscript>
-
-		<div id='subredditsBar'>
+		<nav id='subredditsBar'>
 			<input type='text' id='subredditSearcher' onkeydown='gotoSubreddit(this.value,event.keyCode)' placeholder='Goto subreddit'/>
 			<span class="separator">|</span>
 			<a class='subredditURL' href='{% url "picviewer:default" %}'>FRONT</a>
@@ -45,12 +39,12 @@
 			{% endfor %}
 
 			<a id="sourceCode" href="https://github.com/f2rf2r/RedditPicViewer" target="_blank">Source code</a>
-		</div>
+		</nav>
 
-		<div id='headerBar'>
-			<a class='logoLink' href='{{link}}' target="_blank"><img id='logo' src='{{image}}'></a>
+		<header id='headerBar'>
+			<a class='logoLink' href='{{link}}' target="_blank"><img id='logo' src='{{image}}' alt="logo"></a>
 			<a class='logoLink' href='{{link}}' target="_blank"><span id='subredditName'>{{name}}</span></a>
-			<div id='sortBar'>
+			<nav id='sortBar'>
 				{% if subreddit == "" %}
 				{% for ord in orders %}
 				<a class='sortURL' id='sort{{ord}}' href='{% url "picviewer:sort" ord  %}'><span class='sortOrder'>{{ord}}</span></a>
@@ -60,7 +54,7 @@
 				<a class='sortURL' id='sort{{ord}}' href='{% url "picviewer:subredditSort" subreddit ord  %}'><span class='sortOrder'>{{ord}}</span></a>
 				{% endfor %}
 				{% endif %}
-			</div>
+			</nav>
 
 			{% if order == "top" %}
 			<select id="topTimeSelector" onchange=setTopTime(this)>
@@ -95,17 +89,20 @@
 					</select>
 				</div>
 			</div>
-		</div>
+		</header>
 
-		<div id='gallery'>
+		<section id='gallery'>
 			<script>
                 for (var x = 0; x < currentState.numCols; x++) {
                     document.write("<ul class='imageList' id='imageList" + x + "'></ul>");
                 }
 			</script>
-		</div>
+		</section>
 
-		<div class="centerWrapper">
+		<section id="indicator">
+			<noscript>
+				Please enable javascript to use this site.
+			</noscript>
 			<div id='endNotification'>
 				There are no more links
 			</div>
@@ -114,11 +111,12 @@
 			</button>
 			<img src="{% static 'picviewer/media/loading.gif' %}" id='loadingGif' alt='Loading...'>
 
-		</div>
+		</section>
+
+		<script>
+            setup();
+		</script>
 	</body>
 
-	<script>
-        setup();
-	</script>
 </html>
 

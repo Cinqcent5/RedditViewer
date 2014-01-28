@@ -155,6 +155,7 @@ function parseJSON(responseText) {
                 imageNode.setAttribute("class", "image");
                 imageNode.setAttribute("src", thumbUrl);
                 imageNode.setAttribute("width", width);
+                imageNode.setAttribute("alt", title);
 
                 var imageLinkNode = document.createElement("a");
                 imageLinkNode.setAttribute("class", "imageLink");
@@ -163,15 +164,15 @@ function parseJSON(responseText) {
                 imageLinkNode.appendChild(imageNode);
 
                 //Overlays
-                var voteNode = document.createElement("span");
+                var voteNode = document.createElement("p");
                 voteNode.setAttribute("class", "voteCount");
                 voteNode.innerHTML = data.score + " pts";
 
-                var commentNode = document.createElement("span");
+                var commentNode = document.createElement("p");
                 commentNode.setAttribute("class", "commentCount");
                 commentNode.innerHTML = data.num_comments + " comments";
 
-                var countContainer = document.createElement("div");
+                var countContainer = document.createElement("article");
                 countContainer.setAttribute("class", "countContainer");
                 countContainer.appendChild(voteNode);
                 countContainer.appendChild(commentNode);
