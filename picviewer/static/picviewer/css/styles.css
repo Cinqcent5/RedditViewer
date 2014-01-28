@@ -151,13 +151,13 @@ a.imageLink {
 	border-radius: 0 0 3px 3px;
 }
 
-.imageOverlay a {
+.imageOverlay a ,.commentCount{
 	color: #333333;
 }
-.imageOverlay a:visited {
+.imageOverlay a:visited,.commentCount:visited {
 	color: #AAAAAA;
 }
-.imageOverlay a:hover {
+.imageOverlay a:hover,.commentCount:visited {
 	color: #369;
 }
 

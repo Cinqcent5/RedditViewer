@@ -182,9 +182,11 @@ function parseJSON(responseText) {
                 voteNode.setAttribute("class", "voteCount");
                 voteNode.innerHTML = data.score + " pts";
 
-                var commentNode = document.createElement("p");
+                var commentNode = document.createElement("a");
                 commentNode.setAttribute("class", "commentCount");
                 commentNode.innerHTML = data.num_comments + " comments";
+                commentNode.setAttribute("href", currentState.baseLink + permalink);
+                commentNode.setAttribute("target", "_blank");
 
                 var countContainer = document.createElement("article");
                 countContainer.setAttribute("class", "countContainer");
