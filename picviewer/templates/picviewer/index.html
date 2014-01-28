@@ -17,11 +17,11 @@
                 m.parentNode.insertBefore(a, m)
             })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
-            ga('create', 'UA-47444408-1', 'redditpicviewer.appspot.com');
+            ga('create', 'UA-47444408-1', 'redditviewer.com');
             ga('send', 'pageview');
 
 		</script>
-		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js"></script>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js"></script>
 		<script type="text/javascript" src="{% static 'picviewer/js/main.js' %}"></script>
 		<script>
             currentState = new CurrentState("{{subreddit}}", "{{order}}", "{{timeFrame}}", "{{query}}", "{{searchTime}}", "{{searchOrder}}", "{{user}}");
