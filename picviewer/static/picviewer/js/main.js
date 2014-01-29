@@ -63,6 +63,7 @@ function CurrentState(subreddit, order, timeFrame, query, searchTime, searchOrde
 
 }
 
+// Initiate the request to retrieve the submission listing
 function sendRequest() {
     if (currentState.pendingRequest) {
         return;
@@ -100,6 +101,7 @@ function sendRequest() {
     }
 };
 
+// Handler for when the reddit server responds to the listing request
 function stateChangeHandlers() {
     if (this.readyState == 4) {
         $("#loadingGif").hide();
@@ -122,6 +124,7 @@ function stateChangeHandlers() {
     }
 };
 
+// Parse the response and add the images/links to the html
 function parseJSON(responseText) {
     var width = 350;
     var responseJSON = JSON.parse(responseText);
@@ -266,11 +269,13 @@ function displayOverlay(obj, show) {
     }
 };
 
+// Direct the user to the correct url when they click on the sort by time
 function setTimeFrame(obj) {
     var t = obj.options[obj.selectedIndex].value;
     document.location = currentState.order + "?t=" + t;
 }
 
+// Directs the user to the correct search url
 function sendSearchRequest() {
     var searchBox = document.getElementById("searchBox");
     if (searchBox.value == "") {
@@ -284,12 +289,14 @@ function sendSearchRequest() {
     document.location = "/" + subreddit + "search?q=" + searchBox.value + "&t=" + t + "&sort=" + sort;
 }
 
+// Load more images when the user scroll to near the bottom
 function scrollHandler() {
-    if ($(window).scrollTop() + $(window).height() >= $(document).height() - 1500) {
+    if ($(window).scrollTop() + $(window).height() >= $(document).height() - 1200) {
         sendRequest(currentState.subreddit);
     }
 };
 
+// Send the search request when the user presses "Enter" key
 function checkSearchBox(keyCode) {
     if (keyCode == 13) {
         sendSearchRequest();
@@ -301,6 +308,7 @@ function gotoSubreddit(value, keyCode) {
         document.location = '/r/' + value;
     }
 }
+
 
 function sendSubredditSearchRequest(value) {
     if (value != '') {
@@ -328,6 +336,7 @@ function subredditSearchStateChangeHandler() {
     }
 }
 
+// Initial setup
 function setup() {
 
     //indicate the current sort order
