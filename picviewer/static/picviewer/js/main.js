@@ -173,6 +173,7 @@ function parseJSON(responseText) {
                 imageNode.setAttribute("src", thumbUrl);
                 imageNode.setAttribute("width", width);
                 imageNode.setAttribute("alt", title);
+                imageNode.onload = checkImageHeight;
 
                 var imageLinkNode = document.createElement("a");
                 imageLinkNode.setAttribute("class", "imageLink");
@@ -309,6 +310,15 @@ function gotoSubreddit(value, keyCode) {
     }
 }
 
+// For very tall imgur images, use the original resolution image as the thumbnail
+function checkImageHeight() {
+    if (this.offsetHeight > 1200) {
+        url = this.getAttribute("src");
+        if (url.match(/i\.imgur\.com\/[A-z0-9]{5,7}l\.(jpeg|jpg|png|bmp)$/)) {
+            this.setAttribute("src", url.replace(/l\./, "."));
+        }
+    }
+}
 
 function sendSubredditSearchRequest(value) {
     if (value != '') {
