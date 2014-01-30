@@ -1,6 +1,9 @@
+from django.http.response import HttpResponse
 from django.shortcuts import render
+from picviewer.models import User
 import json
 import urllib2
+import uuid
 
 def subredditSort(request, subreddit, order):
     return mainView(request, subreddit, order,"");
@@ -70,6 +73,19 @@ def mainView(request, subreddit, order,user):
     
     context['userOrders'] = ['hot', 'new', 'controversial', 'top']
     context['user']=user
+    
+    if request.COOKIES.has_key( 'riv' ):
+        uid = User.objects.get(uid=request.COOKIES[ 'riv' ])
+        context["riv"]=uid
+
+    response=render(request, 'picviewer/index.html', context)
+    
+    
+    if not request.COOKIES.has_key( 'riv' ):
+        uid =uuid.uuid4()
+        response.set_cookie( key='riv', value=uid,max_age=31536000 )
+        user = User(uid=uid)
+        user.save()
         
-    return render(request, 'picviewer/index.html', context)
+    return  response
 
