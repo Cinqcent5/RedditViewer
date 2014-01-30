@@ -1,4 +1,4 @@
-function CurrentState(subreddit, order, timeFrame, query, searchTime, searchOrder, user) {
+function CurrentState(subreddit, order, timeFrame, query, searchTime, searchOrder, user, allowNSFW) {
     this.baseLink = "http://www.reddit.com";
 
     this.subreddit = subreddit;
@@ -8,6 +8,7 @@ function CurrentState(subreddit, order, timeFrame, query, searchTime, searchOrde
     this.searchTime = searchTime;
     this.searchOrder = searchOrder;
     this.user = user;
+    this.allowNSFW = allowNSFW == "True";
 
     this.lastFullname = "";
     this.pendingRequest = false;
@@ -137,111 +138,114 @@ function parseJSON(responseText) {
         var title = data.title;
         var fullname = data.name;
 
-        // Only display images that haven't been shown yet
-        if (!( fullname in currentState.alreadyShown)) {
-            var url = data.url;
-            var thumbUrl = url;
-            var isPicture = false;
-            var match;
-            if (( match = url.match(/(i\.imgur\.com\/[A-z0-9]{5,7})(\.(jpeg|jpg|png|bmp))$/)) != null) {
-                // if it's an direct image url from imgur, we can limit the image
-                // size to 640x640
-                // by adding 'l' to the end of the file hash
-                thumbUrl = "http://" + match[1] + "l" + match[2];
-                isPicture = true;
-            } else if (( match = url.match(/imgur\.com\/([A-z0-9]{5,7})$/)) != null) {
-                // if it's an imgur url in the form of imgur.com/xxxxxxx , there
-                // will be a picture at
-                // i.imgur.com/xxxxxxxl.jpg that can be used for thumbnail
-                thumbUrl = "http://i.imgur.com/" + match[1] + "l.jpg";
-                isPicture = true;
-            } else if (url.match(/\.(jpeg|jpg|gif|png|bmp)$/) != null) {
-                isPicture = true;
-            }
-
-            // Only display the link if it's a image
-            if (isPicture) {
-                // If this is the max column, skip the first turn to let others catch up
-                if (currentState.maxCol >= 0 && currentColumn == currentState.maxCol) {
-                    currentState.maxCol = -1;
-                    currentColumn = (currentColumn + 1) % currentState.numCols;
+        // check for NSFW content
+        if (currentState.allowNSFW || data.over_18 == false) {
+            // Only display images that haven't been shown yet
+            if (!( fullname in currentState.alreadyShown)) {
+                var url = data.url;
+                var thumbUrl = url;
+                var isPicture = false;
+                var match;
+                if (( match = url.match(/(i\.imgur\.com\/[A-z0-9]{5,7})(\.(jpeg|jpg|png|bmp))$/)) != null) {
+                    // if it's an direct image url from imgur, we can limit the image
+                    // size to 640x640
+                    // by adding 'l' to the end of the file hash
+                    thumbUrl = "http://" + match[1] + "l" + match[2];
+                    isPicture = true;
+                } else if (( match = url.match(/imgur\.com\/([A-z0-9]{5,7})$/)) != null) {
+                    // if it's an imgur url in the form of imgur.com/xxxxxxx , there
+                    // will be a picture at
+                    // i.imgur.com/xxxxxxxl.jpg that can be used for thumbnail
+                    thumbUrl = "http://i.imgur.com/" + match[1] + "l.jpg";
+                    isPicture = true;
+                } else if (url.match(/\.(jpeg|jpg|gif|png|bmp)$/) != null) {
+                    isPicture = true;
                 }
 
-                //image
-                var imageNode = document.createElement("img");
-                imageNode.setAttribute("class", "image");
-                imageNode.setAttribute("src", thumbUrl);
-                imageNode.setAttribute("width", width);
-                imageNode.setAttribute("alt", title);
-                imageNode.onload = checkImageHeight;
+                // Only display the link if it's a image
+                if (isPicture) {
+                    // If this is the max column, skip the first turn to let others catch up
+                    if (currentState.maxCol >= 0 && currentColumn == currentState.maxCol) {
+                        currentState.maxCol = -1;
+                        currentColumn = (currentColumn + 1) % currentState.numCols;
+                    }
 
-                var imageLinkNode = document.createElement("a");
-                imageLinkNode.setAttribute("class", "imageLink");
-                imageLinkNode.setAttribute("href", url);
-                imageLinkNode.setAttribute("target", "_blank");
-                imageLinkNode.appendChild(imageNode);
+                    //image
+                    var imageNode = document.createElement("img");
+                    imageNode.setAttribute("class", "image");
+                    imageNode.setAttribute("src", thumbUrl);
+                    imageNode.setAttribute("width", width);
+                    imageNode.setAttribute("alt", title);
+                    imageNode.onload = checkImageHeight;
 
-                //Overlays
-                var voteNode = document.createElement("p");
-                voteNode.setAttribute("class", "voteCount");
-                voteNode.innerHTML = data.score + " pts";
+                    var imageLinkNode = document.createElement("a");
+                    imageLinkNode.setAttribute("class", "imageLink");
+                    imageLinkNode.setAttribute("href", url);
+                    imageLinkNode.setAttribute("target", "_blank");
+                    imageLinkNode.appendChild(imageNode);
 
-                var commentNode = document.createElement("a");
-                commentNode.setAttribute("class", "commentCount");
-                commentNode.innerHTML = data.num_comments + " comments";
-                commentNode.setAttribute("href", currentState.baseLink + permalink);
-                commentNode.setAttribute("target", "_blank");
+                    //Overlays
+                    var voteNode = document.createElement("p");
+                    voteNode.setAttribute("class", "voteCount");
+                    voteNode.innerHTML = data.score + " pts";
 
-                var countContainer = document.createElement("article");
-                countContainer.setAttribute("class", "countContainer");
-                countContainer.appendChild(voteNode);
-                countContainer.appendChild(commentNode);
+                    var commentNode = document.createElement("a");
+                    commentNode.setAttribute("class", "commentCount");
+                    commentNode.innerHTML = data.num_comments + " comments";
+                    commentNode.setAttribute("href", currentState.baseLink + permalink);
+                    commentNode.setAttribute("target", "_blank");
 
-                var permalinkNode = document.createElement("a");
-                permalinkNode.setAttribute("class", "permalink");
-                permalinkNode.setAttribute("href", url);
-                permalinkNode.setAttribute("target", "_blank");
-                permalinkNode.innerHTML = title;
+                    var countContainer = document.createElement("article");
+                    countContainer.setAttribute("class", "countContainer");
+                    countContainer.appendChild(voteNode);
+                    countContainer.appendChild(commentNode);
 
-                var authorNode = document.createElement("a");
-                authorNode.setAttribute("class", "author");
-                authorNode.setAttribute("href", "/u/" + data.author);
-                authorNode.setAttribute("target", "_blank");
-                authorNode.innerHTML = "u/" + data.author;
+                    var permalinkNode = document.createElement("a");
+                    permalinkNode.setAttribute("class", "permalink");
+                    permalinkNode.setAttribute("href", url);
+                    permalinkNode.setAttribute("target", "_blank");
+                    permalinkNode.innerHTML = title;
 
-                var subredditNode = document.createElement("a");
-                subredditNode.setAttribute("class", "imageSubreddit");
-                subredditNode.setAttribute("href", "/r/" + data.subreddit);
-                subredditNode.setAttribute("target", "_blank");
-                subredditNode.innerHTML = "r/" + data.subreddit;
+                    var authorNode = document.createElement("a");
+                    authorNode.setAttribute("class", "author");
+                    authorNode.setAttribute("href", "/u/" + data.author);
+                    authorNode.setAttribute("target", "_blank");
+                    authorNode.innerHTML = "u/" + data.author;
 
-                var overlayNode = document.createElement("div");
-                overlayNode.setAttribute("class", "imageOverlay");
-                overlayNode.appendChild(countContainer);
-                overlayNode.appendChild(permalinkNode);
-                overlayNode.appendChild(authorNode);
-                overlayNode.appendChild(subredditNode);
+                    var subredditNode = document.createElement("a");
+                    subredditNode.setAttribute("class", "imageSubreddit");
+                    subredditNode.setAttribute("href", "/r/" + data.subreddit);
+                    subredditNode.setAttribute("target", "_blank");
+                    subredditNode.innerHTML = "r/" + data.subreddit;
 
-                //Container
-                var imageContainerNode = document.createElement("ul");
-                imageContainerNode.setAttribute("class", "imageContainer");
-                imageContainerNode.setAttribute("id", fullname);
-                imageContainerNode.setAttribute("onmouseover", 'displayOverlay(this,true)');
-                imageContainerNode.setAttribute('onmouseout', 'displayOverlay(this,false)');
-                imageContainerNode.appendChild(imageLinkNode);
-                imageContainerNode.appendChild(overlayNode);
+                    var overlayNode = document.createElement("div");
+                    overlayNode.setAttribute("class", "imageOverlay");
+                    overlayNode.appendChild(countContainer);
+                    overlayNode.appendChild(permalinkNode);
+                    overlayNode.appendChild(authorNode);
+                    overlayNode.appendChild(subredditNode);
 
-                document.getElementById("imageList" + currentColumn).appendChild(imageContainerNode);
+                    //Container
+                    var imageContainerNode = document.createElement("ul");
+                    imageContainerNode.setAttribute("class", "imageContainer");
+                    imageContainerNode.setAttribute("id", fullname);
+                    imageContainerNode.setAttribute("onmouseover", 'displayOverlay(this,true)');
+                    imageContainerNode.setAttribute('onmouseout', 'displayOverlay(this,false)');
+                    imageContainerNode.appendChild(imageLinkNode);
+                    imageContainerNode.appendChild(overlayNode);
 
-                // fill the first two images to the shortest column to let it catch
-                // up
-                if (currentState.minCol >= 0 && currentColumn == currentState.minCol) {
-                    currentState.minCol = -1;
-                } else {
-                    currentColumn = (currentColumn + 1) % currentState.numCols;
+                    document.getElementById("imageList" + currentColumn).appendChild(imageContainerNode);
+
+                    // fill the first two images to the shortest column to let it catch
+                    // up
+                    if (currentState.minCol >= 0 && currentColumn == currentState.minCol) {
+                        currentState.minCol = -1;
+                    } else {
+                        currentColumn = (currentColumn + 1) % currentState.numCols;
+                    }
                 }
+                currentState.alreadyShown[fullname] = true;
             }
-            currentState.alreadyShown[fullname] = true;
         }
     }
 
@@ -318,6 +322,11 @@ function checkImageHeight() {
             this.setAttribute("src", url.replace(/l\./, "."));
         }
     }
+}
+
+// Toggle the settings dropdown
+function toggleSettingsDropdown() {
+    $("#settingsDropdown").toggle();
 }
 
 function sendSubredditSearchRequest(value) {

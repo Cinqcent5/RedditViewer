@@ -6,29 +6,29 @@ import urllib2
 import uuid
 
 def subredditSort(request, subreddit, order):
-    return mainView(request, subreddit, order,"");
+    return mainView(request, subreddit, order, "");
     
 def sort(request, order):
-    return mainView(request, "", order,"")
+    return mainView(request, "", order, "")
 
 def subredditSearch(request, subreddit):
-    return mainView(request, subreddit, "","")
+    return mainView(request, subreddit, "", "")
 
 def subreddit(request, subreddit):
-    return mainView(request, subreddit, "","")
+    return mainView(request, subreddit, "", "")
 
 def userSort(request, user, order):
-    return mainView(request, "", order,user);
+    return mainView(request, "", order, user);
 
-def user(request,user):
-    return mainView(request, "", "",user);
+def user(request, user):
+    return mainView(request, "", "", user);
         
 def default(request):
-    return mainView(request, "", "","")
+    return mainView(request, "", "", "")
 
 
 
-def mainView(request, subreddit, order,user): 
+def mainView(request, subreddit, order, user): 
     context = {}
     context['columns'] = [i for i in range(4)]
     context['subreddits'] = ['adviceanimals', 'aww', 'earthporn', 'funny', 'gaming', 'gifs', 'pics', 'reactiongifs', 'wallpapers', 'wtf']
@@ -62,7 +62,7 @@ def mainView(request, subreddit, order,user):
     else:
         try:
             h1 = urllib2.urlopen("http://www.reddit.com/r/" + subreddit + "/about.json", timeout=5)
-            jsonObj=json.loads(h1.read())
+            jsonObj = json.loads(h1.read())
             context['image'] = jsonObj["data"]["header_img"]
             context['link'] = "http://www.reddit.com/r/" + subreddit
             context['name'] = jsonObj["data"]["display_name"]
@@ -72,18 +72,35 @@ def mainView(request, subreddit, order,user):
             context['name'] = ""
     
     context['userOrders'] = ['hot', 'new', 'controversial', 'top']
-    context['user']=user
+    context['user'] = user
     
-    if request.COOKIES.has_key( 'riv' ):
-        uid = User.objects.get(uid=request.COOKIES[ 'riv' ])
-        context["riv"]=uid
+    if request.COOKIES.has_key('riv'):
+        # returning user, retrieve his/her settings
+        try:
+            user = User.objects.get(uid=request.COOKIES[ 'riv' ])
+        except:
+            user = User(uid=request.COOKIES[ 'riv' ])
+        if "save_settings" in request.POST:
+            # user just clicked on save settings button, save the settings
+            # to the database
+            if "allow_nsfw" in request.POST:
+                user.allow_nsfw = True;
+            else:
+                user.allow_nsfw = False;
+            user.save()
+        context["allowNSFW"] = user.allow_nsfw;
 
-    response=render(request, 'picviewer/index.html', context)
+    else:
+        # user default settings
+        context["allowNSFW"] = False;
+       
+    response = render(request, 'picviewer/index.html', context)
     
     
-    if not request.COOKIES.has_key( 'riv' ):
-        uid =uuid.uuid4()
-        response.set_cookie( key='riv', value=uid,max_age=31536000 )
+    if not request.COOKIES.has_key('riv'):
+        # first time user
+        uid = uuid.uuid4()
+        response.set_cookie(key='riv', value=uid, max_age=31536000)
         user = User(uid=uid)
         user.save()
         

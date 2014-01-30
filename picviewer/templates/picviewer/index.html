@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 
 {% load staticfiles %}
-
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 	<head>
 		<script>
@@ -24,7 +23,7 @@
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js"></script>
 		<script type="text/javascript" src="{% static 'picviewer/js/main.js' %}"></script>
 		<script>
-            currentState = new CurrentState("{{subreddit}}", "{{order}}", "{{timeFrame}}", "{{query}}", "{{searchTime}}", "{{searchOrder}}", "{{user}}");
+            currentState = new CurrentState("{{subreddit}}", "{{order}}", "{{timeFrame}}", "{{query}}", "{{searchTime}}", "{{searchOrder}}", "{{user}}","{{allowNSFW}}");
 		</script>
 		<link type="text/css" rel="stylesheet" href="{% static 'picviewer/css/styles.css' %}" />
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -92,30 +91,50 @@
 				{% endfor %}
 			</select>
 			{% endif %}
+			<section id="rightHeader">
 
-			<button id="searchButton" onclick='sendSearchRequest()'>
-				Search
-			</button>
-			<div id='searchBar'>
-				<input type='text' id='searchBox' onkeydown='checkSearchBox(event.keyCode)' value="{{query}}" placeholder='Search'/>
+				<div id='searchBar'>
+					<input type='text' id='searchBox' onkeydown='checkSearchBox(event.keyCode)' value="{{query}}" placeholder='Search'/>
 
-				<div id="searchOptions">
-					<select id="searchSortSelector">
-						{% for so in searchOrders %}
-						<option class='searchSortOption'
-						{% if so == searchOrder %} selected {% endif %}
-						value={{so}}>{{so}}</option>
-						{% endfor %}
-					</select>
-					<select id="searchTimeSelector">
-						{% for t in timeFrames %}
-						<option class='searchTimeOption'
-						{% if t.0 == searchTime %} selected {% endif %}
-						value={{t.0}}>{{t.1}}</option>
-						{% endfor %}
-					</select>
+					<div id="searchOptions">
+						<select id="searchSortSelector">
+							{% for so in searchOrders %}
+							<option class='searchSortOption'
+							{% if so == searchOrder %} selected {% endif %}
+							value={{so}}>{{so}}</option>
+							{% endfor %}
+						</select>
+						<select id="searchTimeSelector">
+							{% for t in timeFrames %}
+							<option class='searchTimeOption'
+							{% if t.0 == searchTime %} selected {% endif %}
+							value={{t.0}}>{{t.1}}</option>
+							{% endfor %}
+						</select>
+					</div>
 				</div>
-			</div>
+				<button id="searchButton" onclick='sendSearchRequest()'>
+					Search
+				</button>
+
+				<section id="settingsContainer">
+					<button id="settingsButton" onclick="toggleSettingsDropdown()">
+						Settings
+					</button>
+					<form name="settingsForm" action="" method="post">
+						{% csrf_token %}
+						<ul id="settingsDropdown" onmouseleave="toggleSettingsDropdown()">
+							<li class="settingsItem">
+								<span> Allow NSFW</span>
+								<input type="checkbox" name="allow_nsfw" value="5" {% if allowNSFW %}checked{% endif %}/>
+							</li>
+							<li id="saveSettingsContainer">
+								<input id="saveSettingsButton" type="submit" name="save_settings" value="Save"/>
+							</li>
+						</ul>
+					</form>
+				</section>
+			</section>
 		</header>
 
 		<section id='gallery'>
@@ -133,7 +152,7 @@
 			<div id='endNotification'>
 				There are no more links
 			</div>
-			<button id="loadMoreButton" onclick='sendRequest("{{subreddit}}")'>
+			<button id="loadMoreButton" onclick='sendRequest()'>
 				Load more
 			</button>
 			<img src="{% static 'picviewer/media/loading.gif' %}" id='loadingGif' alt='Loading...'>

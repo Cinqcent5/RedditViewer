@@ -86,24 +86,82 @@ noscript {
 	display: inline-block;
 }
 
+#rightHeader {
+	position: absolute;
+	right: 0;
+	display: inline-block;
+	text-align: right;
+	padding-right: 50px;
+}
+
 /* search */
 #searchBar {
-	float: right;
 	display: inline-block;
 }
 
 #searchButton {
-	float: right;
+	vertical-align: top;
 	display: inline-block;
-	margin-right: 50px;
+	margin-right: 30px;
 }
-
 #searchBox {
 	display: block;
 }
 
 #searchOptions {
+	text-align: left;
 	display: block;
+}
+
+/* settings */
+#settingsContainer {
+	display: inline-block;
+}
+
+#settingsButton {
+	vertical-align: bottom;
+	text-align: center;
+	outline: none;
+	padding: 5px;
+	border: 1px solid #5F99CF;
+	border-radius: 4px;
+	background-color: #CEE3f8;
+	display: inline-block;
+	font-size: small;
+	color: #333333;
+}
+#settingsButton:hover {
+	color: #369
+}
+
+#settingsDropdown {
+	display: none;
+	position: absolute;
+	margin-right: 50px;
+	padding: 10px;
+	text-align: left;
+	border-radius: 4px;
+	border: solid 1px #bbb;
+	list-style: none;
+	top: 40px;
+	right: 0;
+	background-color: white;;
+	z-index: 10;
+}
+
+.settingsItem {
+	border-bottom: solid 1px #bbb;
+	padding: 5px 0px;
+}
+#saveSettingsContainer {
+	text-align: center;
+	padding: 5px 0px;
+}
+#saveSettingsButton {
+	outline: none;
+	border: solid 1px #5F99CF;
+	border-radius: 4px;
+	background-color: white;
 }
 
 /*gallery */
