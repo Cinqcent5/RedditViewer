@@ -11,12 +11,19 @@ libraries:
   version: 1.5
 
 handlers:
+  
+- url: /favicon.ico
+  static_files: favicon.ico
+  upload: favicon.ico
+  
 - url: /static
   static_dir: static
  
 - url: /picviewer/static
   static_dir: picviewer/static
-  
+
+
+      
 - url: /.*
   script: main.application
 
