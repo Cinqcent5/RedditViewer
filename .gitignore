@@ -51,4 +51,12 @@ docs/_build/
 
 # Collected static files
 /static
+
 /analytics
+
+# django-nonrel files
+/autoload
+/dbindexer
+/django
+/djangoappengine
+/djangotoolbox
