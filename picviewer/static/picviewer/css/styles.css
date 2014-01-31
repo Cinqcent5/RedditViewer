@@ -3,8 +3,16 @@ body, div, span, ul, ol, li, img, a, select, p, article, header, nav, section {
 	margin: 0px;
 	font: normal x-small verdana, arial, helvetica, sans-serif;
 }
+
 a {
 	text-decoration: none;
+	color: #333333;
+}
+a:visited {
+	color: #AAAAAA;
+}
+a:hover {
+	color: #369;
 }
 body {
 	background-color: #FDFDFD;
@@ -148,8 +156,21 @@ noscript {
 }
 
 .settingsItem {
+	display: block;
+	width:100%;
 	border-bottom: solid 1px #bbb;
 	padding: 5px 0px;
+}
+.settingsLabel{
+	float: left;
+	padding-right: 5px;
+}
+.settingsField{
+	float:right;
+	text-align: right;
+}
+.clear{
+	clear: both;
 }
 #saveSettingsContainer {
 	text-align: center;
@@ -160,6 +181,10 @@ noscript {
 	border: solid 1px #5F99CF;
 	border-radius: 4px;
 	background-color: white;
+}
+
+#saveSettingsButton:hover {
+	color: #369
 }
 
 /*gallery */
@@ -189,36 +214,38 @@ a.imageLink {
 	display: block;
 }
 
+.imageWithDetails {
+	border-radius: 0px 0px 3px 3px;
+	display: block;
+}
+
 /* overlay */
-.imageOverlay {
-	display: none;
+.details, .detailsOverlay {
 	font-size: medium;
-	position: absolute;
-	top: 0;
-	left: 0;
 	word-wrap: break-word;
-	width: 100%;
+	width: 350px;
 	text-align: center;
 	padding-bottom: 5px;
 	padding-top: 5px;
 	background: rgb(255, 255, 255); /* The Fallback */
-	background: rgba(255, 255, 255, .96);
-	z-index: 5;
 	border-radius: 3px 3px 0 0;
 }
+.detailsOverlay {
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background: rgba(255, 255, 255, .96);
+	z-index: 5;
+}
 
-.imageOverlay a, .commentCount {
-	color: #333333;
-}
-.imageOverlay a:visited, .commentCount:visited {
-	color: #AAAAAA;
-}
-.imageOverlay a:hover, .commentCount:visited {
-	color: #369;
+.details {
+	display: block;
+	font-size: medium;
+	position: relative;
 }
 
 .countContainer {
-	font-size: small;
 	padding: 0px 5px;
 	display: block;
 }
@@ -243,13 +270,20 @@ a.imageLink {
 	font-size: medium;
 }
 
+.additionalLinks {
+	font-size: small;
+	padding: 0px 5px;
+	display: block;
+}
 .author {
-	float: left;
-	padding-left: 5px;
+	display: inline-block;
+	width: 50%;
+	text-align: left;;
 }
 .imageSubreddit {
-	float: right;
-	padding-right: 5px;
+	display: inline-block;
+	width: 50%;
+	text-align: right;
 }
 
 /* Bottom */

@@ -1,4 +1,4 @@
-function CurrentState(subreddit, order, timeFrame, query, searchTime, searchOrder, user, allowNSFW) {
+function CurrentState(subreddit, order, timeFrame, query, searchTime, searchOrder, user, allowNSFW, showDetails) {
     this.baseLink = "http://www.reddit.com";
 
     this.subreddit = subreddit;
@@ -9,6 +9,7 @@ function CurrentState(subreddit, order, timeFrame, query, searchTime, searchOrde
     this.searchOrder = searchOrder;
     this.user = user;
     this.allowNSFW = allowNSFW == "True";
+    this.showDetails = showDetails == "True";
 
     this.lastFullname = "";
     this.pendingRequest = false;
@@ -171,7 +172,11 @@ function parseJSON(responseText) {
                     }
                     //image
                     var imageNode = document.createElement("img");
-                    imageNode.setAttribute("class", "image");
+                    if (currentState.showDetails) {
+                        imageNode.setAttribute("class", "imageWithDetails");
+                    } else {
+                        imageNode.setAttribute("class", "image");
+                    }
                     imageNode.setAttribute("src", thumbUrl);
                     imageNode.setAttribute("width", width);
                     imageNode.setAttribute("alt", title);
@@ -183,7 +188,7 @@ function parseJSON(responseText) {
                     imageLinkNode.setAttribute("target", "_blank");
                     imageLinkNode.appendChild(imageNode);
 
-                    //Overlays
+                    //submission details
                     var voteNode = document.createElement("p");
                     voteNode.setAttribute("class", "voteCount");
                     voteNode.innerHTML = data.score + " pts";
@@ -217,22 +222,33 @@ function parseJSON(responseText) {
                     subredditNode.setAttribute("target", "_blank");
                     subredditNode.innerHTML = "r/" + data.subreddit;
 
-                    var overlayNode = document.createElement("div");
-                    overlayNode.setAttribute("class", "imageOverlay");
-                    overlayNode.appendChild(countContainer);
-                    overlayNode.appendChild(permalinkNode);
-                    overlayNode.appendChild(authorNode);
-                    overlayNode.appendChild(subredditNode);
+                    var additionalLinks = document.createElement("article");
+                    additionalLinks.setAttribute("class", "additionalLinks");
+                    additionalLinks.appendChild(authorNode);
+                    additionalLinks.appendChild(subredditNode);
+
+                    var detailsNode = document.createElement("div");
+                    if (currentState.showDetails) {
+                        detailsNode.setAttribute("class", "details");
+                    } else {
+                        detailsNode.setAttribute("class", "detailsOverlay");
+                    }
+                    detailsNode.appendChild(countContainer);
+                    detailsNode.appendChild(permalinkNode);
+                    detailsNode.appendChild(additionalLinks);
 
                     //Container
                     var imageContainerNode = document.createElement("ul");
                     imageContainerNode.setAttribute("class", "imageContainer");
                     imageContainerNode.setAttribute("id", fullname);
-                    imageContainerNode.addEventListener("mouseover", displayOverlay);
-                    imageContainerNode.addEventListener('mouseout', hideOverlay);
+                    if (!currentState.showDetails) {
+                        imageContainerNode.addEventListener("mouseover", displayOverlay);
+                        imageContainerNode.addEventListener('mouseout', hideOverlay);
+                    }
 
+                    imageContainerNode.appendChild(detailsNode);
                     imageContainerNode.appendChild(imageLinkNode);
-                    imageContainerNode.appendChild(overlayNode);
+
                     document.getElementById("imageList" + currentColumn).appendChild(imageContainerNode);
 
                     // fill the first two images to the shortest column to let it catch
@@ -266,11 +282,11 @@ function parseJSON(responseText) {
 // Toggles the image overlay (title, comment link, etc) when the mouse
 // hovers over and when it moves out
 function displayOverlay() {
-    this.lastChild.style.display = 'block';
+    this.firstChild.style.display = 'block';
 };
 
 function hideOverlay() {
-    this.lastChild.style.display = 'none';
+    this.firstChild.style.display = 'none';
 }
 
 // Direct the user to the correct url when they click on the sort by time

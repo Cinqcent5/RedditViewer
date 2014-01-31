@@ -23,7 +23,7 @@
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js"></script>
 		<script type="text/javascript" src="{% static 'picviewer/js/main.js' %}"></script>
 		<script>
-            currentState = new CurrentState("{{subreddit}}", "{{order}}", "{{timeFrame}}", "{{query}}", "{{searchTime}}", "{{searchOrder}}", "{{user}}","{{allowNSFW}}");
+            currentState = new CurrentState("{{subreddit}}", "{{order}}", "{{timeFrame}}", "{{query}}", "{{searchTime}}", "{{searchOrder}}", "{{user}}", "{{allowNSFW}}", "{{showDetails}}");
 		</script>
 		<link type="text/css" rel="stylesheet" href="{% static 'picviewer/css/styles.css' %}" />
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -56,7 +56,7 @@
 			{% endif %}
 			{% endfor %}
 
-			<a id="sourceCode" href="https://github.com/f2rf2r/RedditPicViewer" target="_blank">Source code</a>
+			<a id="sourceCode" href="https://github.com/f2rf2r/RedditViewer" target="_blank">Source code</a>
 		</nav>
 
 		<header id='headerBar'>
@@ -125,8 +125,14 @@
 						{% csrf_token %}
 						<ul id="settingsDropdown" onmouseleave="toggleSettingsDropdown()">
 							<li class="settingsItem">
-								<span> Allow NSFW</span>
-								<input type="checkbox" name="allow_nsfw" value="5" {% if allowNSFW %}checked{% endif %}/>
+								<label class="settingsLabel"> Allow NSFW</label>
+								<input class="settingsField" type="checkbox" name="allow_nsfw" value="True" {% if allowNSFW %}checked{% endif %}/>
+								<div class="clear"></div>
+							</li>
+							<li class="settingsItem">
+								<label class="settingsLabel"> Always show submission details</label>
+								<input class="settingsField" type="checkbox" name="show_details" value="True" {% if showDetails %}checked{% endif %}/>
+								<div class="clear"></div>
 							</li>
 							<li id="saveSettingsContainer">
 								<input id="saveSettingsButton" type="submit" name="save_settings" value="Save"/>

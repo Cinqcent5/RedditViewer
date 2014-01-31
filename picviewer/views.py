@@ -83,16 +83,16 @@ def mainView(request, subreddit, order, user):
         if "save_settings" in request.POST:
             # user just clicked on save settings button, save the settings
             # to the database
-            if "allow_nsfw" in request.POST:
-                user.allow_nsfw = True;
-            else:
-                user.allow_nsfw = False;
+            user.allow_nsfw = "allow_nsfw" in request.POST
+            user.show_details = "show_details" in request.POST
             user.save()
-        context["allowNSFW"] = user.allow_nsfw;
+        context["allowNSFW"] = user.allow_nsfw
+        context["showDetails"] = user.show_details
 
     else:
         # user default settings
         context["allowNSFW"] = False;
+        context["showDetails"] = False;
        
     response = render(request, 'picviewer/index.html', context)
     
