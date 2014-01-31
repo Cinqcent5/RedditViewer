@@ -200,6 +200,7 @@ noscript {
 	vertical-align: top;
 }
 .imageContainer {
+	min-height: 100px;
 	margin: 10px;
 	position: relative;
 	display: block;
