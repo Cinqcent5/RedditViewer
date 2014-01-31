@@ -169,7 +169,6 @@ function parseJSON(responseText) {
                         currentState.maxCol = -1;
                         currentColumn = (currentColumn + 1) % currentState.numCols;
                     }
-
                     //image
                     var imageNode = document.createElement("img");
                     imageNode.setAttribute("class", "image");
@@ -229,11 +228,11 @@ function parseJSON(responseText) {
                     var imageContainerNode = document.createElement("ul");
                     imageContainerNode.setAttribute("class", "imageContainer");
                     imageContainerNode.setAttribute("id", fullname);
-                    imageContainerNode.setAttribute("onmouseover", 'displayOverlay(this,true)');
-                    imageContainerNode.setAttribute('onmouseout', 'displayOverlay(this,false)');
+                    imageContainerNode.addEventListener("mouseover", displayOverlay);
+                    imageContainerNode.addEventListener('mouseout', hideOverlay);
+
                     imageContainerNode.appendChild(imageLinkNode);
                     imageContainerNode.appendChild(overlayNode);
-
                     document.getElementById("imageList" + currentColumn).appendChild(imageContainerNode);
 
                     // fill the first two images to the shortest column to let it catch
@@ -266,13 +265,13 @@ function parseJSON(responseText) {
 
 // Toggles the image overlay (title, comment link, etc) when the mouse
 // hovers over and when it moves out
-function displayOverlay(obj, show) {
-    if (show) {
-        obj.lastChild.style.display = 'block';
-    } else {
-        obj.lastChild.style.display = 'none';
-    }
+function displayOverlay() {
+    this.lastChild.style.display = 'block';
 };
+
+function hideOverlay() {
+    this.lastChild.style.display = 'none';
+}
 
 // Direct the user to the correct url when they click on the sort by time
 function setTimeFrame(obj) {

@@ -59,6 +59,13 @@ noscript {
 	color: #369;
 }
 
+#rightHeader {
+	position: absolute;
+	right: 0;
+	display: inline-block;
+	text-align: right;
+	padding-right: 50px;
+}
 /* sort */
 #sortBar {
 	display: inline-block;
@@ -84,14 +91,6 @@ noscript {
 
 #timeFrameSelector {
 	display: inline-block;
-}
-
-#rightHeader {
-	position: absolute;
-	right: 0;
-	display: inline-block;
-	text-align: right;
-	padding-right: 50px;
 }
 
 /* search */
