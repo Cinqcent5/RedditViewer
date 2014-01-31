@@ -35,6 +35,9 @@ noscript {
 .subredditURL, .separator {
 	color: black;
 }
+.subredditURL:visited {
+	color: black;
+}
 #subredditSearcher {
 	margin-left: 10px;
 }
