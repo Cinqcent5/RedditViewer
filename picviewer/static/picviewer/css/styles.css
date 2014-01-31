@@ -74,13 +74,12 @@ noscript {
 }
 .sortURL {
 	padding: 5px 5px 0px 5px;
-	border-bottom: 1px solid #5F99CF;
 	background-color: #EFF7FF;
 }
 .sortURLCurrent {
 	padding: 5px 5px 0px 5px;
 	border: 1px solid #5F99CF;
-	border-bottom-color: #FDFDFD;
+	border-bottom: 2px solid #FDFDFD;
 	background-color: #FDFDFD;
 }
 .sortOrder {
