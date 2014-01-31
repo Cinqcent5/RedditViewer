@@ -60,3 +60,6 @@ docs/_build/
 /django
 /djangoappengine
 /djangotoolbox
+
+# GAE debug data
+.gaedata/

@@ -1,6 +1,6 @@
-from django.http.response import HttpResponse
 from django.shortcuts import render
 from picviewer.models import User
+import datetime
 import json
 import urllib2
 import uuid
@@ -79,23 +79,24 @@ def mainView(request, subreddit, order, user):
         try:
             user = User.objects.get(uid=request.COOKIES[ 'riv' ])
         except:
-            user = User(uid=request.COOKIES[ 'riv' ])
+            user = User(uid=request.COOKIES[ 'riv' ], created_date=datetime.datetime.now())
+        user.last_visited_date = datetime.datetime.now()
         if "save_settings" in request.POST:
             # user just clicked on save settings button, save the settings
             # to the database
             user.allow_nsfw = "allow_nsfw" in request.POST
             user.show_details = "show_details" in request.POST
             user.show_all_links = "show_all_links" in request.POST
-            user.save()
+        user.save()
         context["allowNSFW"] = user.allow_nsfw
         context["showDetails"] = user.show_details
-        context["showAllLinks"]=user.show_all_links
+        context["showAllLinks"] = user.show_all_links
 
     else:
-        # user default settings
+        # use default settings
         context["allowNSFW"] = False
         context["showDetails"] = False
-        context["showAllLinks"]=False
+        context["showAllLinks"] = False
        
     response = render(request, 'picviewer/index.html', context)
     
@@ -104,7 +105,7 @@ def mainView(request, subreddit, order, user):
         # first time user
         uid = uuid.uuid4()
         response.set_cookie(key='riv', value=uid, max_age=31536000)
-        user = User(uid=uid)
+        user = User(uid=uid, created_date=datetime.datetime.now(), last_visited_date=datetime.datetime.now())
         user.save()
         
     return  response
