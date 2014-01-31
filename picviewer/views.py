@@ -85,14 +85,17 @@ def mainView(request, subreddit, order, user):
             # to the database
             user.allow_nsfw = "allow_nsfw" in request.POST
             user.show_details = "show_details" in request.POST
+            user.show_all_links = "show_all_links" in request.POST
             user.save()
         context["allowNSFW"] = user.allow_nsfw
         context["showDetails"] = user.show_details
+        context["showAllLinks"]=user.show_all_links
 
     else:
         # user default settings
-        context["allowNSFW"] = False;
-        context["showDetails"] = False;
+        context["allowNSFW"] = False
+        context["showDetails"] = False
+        context["showAllLinks"]=False
        
     response = render(request, 'picviewer/index.html', context)
     

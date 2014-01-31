@@ -23,7 +23,7 @@
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js"></script>
 		<script type="text/javascript" src="{% static 'picviewer/js/main.js' %}"></script>
 		<script>
-            currentState = new CurrentState("{{subreddit}}", "{{order}}", "{{timeFrame}}", "{{query}}", "{{searchTime}}", "{{searchOrder}}", "{{user}}", "{{allowNSFW}}", "{{showDetails}}");
+            currentState = new CurrentState("{{subreddit}}", "{{order}}", "{{timeFrame}}", "{{query}}", "{{searchTime}}", "{{searchOrder}}", "{{user}}", "{{allowNSFW}}", "{{showDetails}}", "{{showAllLinks}}");
 		</script>
 		<link type="text/css" rel="stylesheet" href="{% static 'picviewer/css/styles.css' %}" />
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -132,6 +132,11 @@
 							<li class="settingsItem">
 								<label class="settingsLabel"> Always show submission details</label>
 								<input class="settingsField" type="checkbox" name="show_details" value="True" {% if showDetails %}checked{% endif %}/>
+								<div class="clear"></div>
+							</li>
+							<li class="settingsItem">
+								<label class="settingsLabel"> Show non-image links</label>
+								<input class="settingsField" type="checkbox" name="show_all_links" value="True" {% if showAllLinks %}checked{% endif %}/>
 								<div class="clear"></div>
 							</li>
 							<li id="saveSettingsContainer">

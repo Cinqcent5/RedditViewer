@@ -1,4 +1,4 @@
-function CurrentState(subreddit, order, timeFrame, query, searchTime, searchOrder, user, allowNSFW, showDetails) {
+function CurrentState(subreddit, order, timeFrame, query, searchTime, searchOrder, user, allowNSFW, showDetails,showAllLinks) {
     this.baseLink = "http://www.reddit.com";
 
     this.subreddit = subreddit;
@@ -10,6 +10,7 @@ function CurrentState(subreddit, order, timeFrame, query, searchTime, searchOrde
     this.user = user;
     this.allowNSFW = allowNSFW == "True";
     this.showDetails = showDetails == "True";
+    this.showAllLinks = showAllLinks=="True";
 
     this.lastFullname = "";
     this.pendingRequest = false;
@@ -141,7 +142,7 @@ function parseJSON(responseText) {
 
         // check for NSFW content
         if (currentState.allowNSFW || data.over_18 == false) {
-            // Only display images that haven't been shown yet
+            // Only display link that haven't been shown yet
             if (!( fullname in currentState.alreadyShown)) {
                 var url = data.url;
                 var thumbUrl = url;
@@ -163,94 +164,60 @@ function parseJSON(responseText) {
                     isPicture = true;
                 }
 
-                // Only display the link if it's a image
-                if (isPicture) {
+                // Only display the link if it's a image or user selected showing all links
+                if (isPicture || currentState.showAllLinks) {
                     // If this is the max column, skip the first turn to let others catch up
                     if (currentState.maxCol >= 0 && currentColumn == currentState.maxCol) {
                         currentState.maxCol = -1;
                         currentColumn = (currentColumn + 1) % currentState.numCols;
                     }
-                    //image
-                    var imageNode = document.createElement("img");
-                    if (currentState.showDetails) {
-                        imageNode.setAttribute("class", "imageWithDetails");
-                    } else {
-                        imageNode.setAttribute("class", "image");
+                    if (isPicture) {
+
+                        //image
+                        var imageNode = document.createElement("img");
+                        if (currentState.showDetails) {
+                            imageNode.setAttribute("class", "imageWithDetails");
+                        } else {
+                            imageNode.setAttribute("class", "image");
+                        }
+                        imageNode.setAttribute("src", thumbUrl);
+                        imageNode.setAttribute("width", width);
+                        imageNode.setAttribute("alt", title);
+                        imageNode.onload = checkImageHeight;
+
+                        var imageLinkNode = document.createElement("a");
+                        imageLinkNode.setAttribute("class", "imageLink");
+                        imageLinkNode.setAttribute("href", url);
+                        imageLinkNode.setAttribute("target", "_blank");
+                        imageLinkNode.appendChild(imageNode);
+
+                        var detailsClass;
+                        if (currentState.showDetails) {
+                            detailsClass = "details";
+                        } else {
+                            detailsClass = "detailsOverlay";
+                        }
+                        detailsNode = createDetailsNode(data, detailsClass);
+
+                        //Container
+                        var imageContainerNode = document.createElement("ul");
+                        imageContainerNode.setAttribute("class", "imageContainer");
+                        imageContainerNode.setAttribute("id", fullname);
+                        if (!currentState.showDetails) {
+                            imageContainerNode.addEventListener("mouseover", displayOverlay);
+                            imageContainerNode.addEventListener('mouseout', hideOverlay);
+                        }
+
+                        imageContainerNode.appendChild(detailsNode);
+                        imageContainerNode.appendChild(imageLinkNode);
+
+                        document.getElementById("imageList" + currentColumn).appendChild(imageContainerNode);
+
+                    } else if (currentState.showAllLinks) {
+                        detailsNode = createDetailsNode(data, "detailsOnly");
+                        document.getElementById("imageList" + currentColumn).appendChild(detailsNode);
+
                     }
-                    imageNode.setAttribute("src", thumbUrl);
-                    imageNode.setAttribute("width", width);
-                    imageNode.setAttribute("alt", title);
-                    imageNode.onload = checkImageHeight;
-
-                    var imageLinkNode = document.createElement("a");
-                    imageLinkNode.setAttribute("class", "imageLink");
-                    imageLinkNode.setAttribute("href", url);
-                    imageLinkNode.setAttribute("target", "_blank");
-                    imageLinkNode.appendChild(imageNode);
-
-                    //submission details
-                    var voteNode = document.createElement("p");
-                    voteNode.setAttribute("class", "voteCount");
-                    voteNode.innerHTML = data.score + " pts";
-
-                    var commentNode = document.createElement("a");
-                    commentNode.setAttribute("class", "commentCount");
-                    commentNode.innerHTML = data.num_comments + " comments";
-                    commentNode.setAttribute("href", currentState.baseLink + permalink);
-                    commentNode.setAttribute("target", "_blank");
-
-                    var countContainer = document.createElement("article");
-                    countContainer.setAttribute("class", "countContainer");
-                    countContainer.appendChild(voteNode);
-                    countContainer.appendChild(commentNode);
-
-                    var permalinkNode = document.createElement("a");
-                    permalinkNode.setAttribute("class", "permalink");
-                    permalinkNode.setAttribute("href", url);
-                    permalinkNode.setAttribute("target", "_blank");
-                    permalinkNode.innerHTML = title;
-
-                    var authorNode = document.createElement("a");
-                    authorNode.setAttribute("class", "author");
-                    authorNode.setAttribute("href", "/u/" + data.author);
-                    authorNode.setAttribute("target", "_blank");
-                    authorNode.innerHTML = "u/" + data.author;
-
-                    var subredditNode = document.createElement("a");
-                    subredditNode.setAttribute("class", "imageSubreddit");
-                    subredditNode.setAttribute("href", "/r/" + data.subreddit);
-                    subredditNode.setAttribute("target", "_blank");
-                    subredditNode.innerHTML = "r/" + data.subreddit;
-
-                    var additionalLinks = document.createElement("article");
-                    additionalLinks.setAttribute("class", "additionalLinks");
-                    additionalLinks.appendChild(authorNode);
-                    additionalLinks.appendChild(subredditNode);
-
-                    var detailsNode = document.createElement("div");
-                    if (currentState.showDetails) {
-                        detailsNode.setAttribute("class", "details");
-                    } else {
-                        detailsNode.setAttribute("class", "detailsOverlay");
-                    }
-                    detailsNode.appendChild(countContainer);
-                    detailsNode.appendChild(permalinkNode);
-                    detailsNode.appendChild(additionalLinks);
-
-                    //Container
-                    var imageContainerNode = document.createElement("ul");
-                    imageContainerNode.setAttribute("class", "imageContainer");
-                    imageContainerNode.setAttribute("id", fullname);
-                    if (!currentState.showDetails) {
-                        imageContainerNode.addEventListener("mouseover", displayOverlay);
-                        imageContainerNode.addEventListener('mouseout', hideOverlay);
-                    }
-
-                    imageContainerNode.appendChild(detailsNode);
-                    imageContainerNode.appendChild(imageLinkNode);
-
-                    document.getElementById("imageList" + currentColumn).appendChild(imageContainerNode);
-
                     // fill the first two images to the shortest column to let it catch
                     // up
                     if (currentState.minCol >= 0 && currentColumn == currentState.minCol) {
@@ -278,6 +245,60 @@ function parseJSON(responseText) {
     }
 
 };
+
+function createDetailsNode(data, detailsClass) {
+    //submission details
+    var voteNode = document.createElement("p");
+    voteNode.setAttribute("class", "voteCount");
+    voteNode.innerHTML = data.score + " pts";
+
+    var commentNode = document.createElement("a");
+    commentNode.setAttribute("class", "commentCount");
+    commentNode.innerHTML = data.num_comments + " comments";
+    commentNode.setAttribute("href", currentState.baseLink + data.permalink);
+    commentNode.setAttribute("target", "_blank");
+
+    var countContainer = document.createElement("article");
+    countContainer.setAttribute("class", "countContainer");
+    countContainer.appendChild(voteNode);
+    countContainer.appendChild(commentNode);
+
+    var permalinkNode = document.createElement("a");
+    permalinkNode.setAttribute("class", "permalink");
+    permalinkNode.setAttribute("href", data.url);
+    permalinkNode.setAttribute("target", "_blank");
+    permalinkNode.innerHTML = data.title;
+
+    var authorNode = document.createElement("a");
+    authorNode.setAttribute("class", "author");
+    authorNode.setAttribute("href", "/u/" + data.author);
+    authorNode.setAttribute("target", "_blank");
+    authorNode.innerHTML = "u/" + data.author;
+
+    var subredditNode = document.createElement("a");
+    subredditNode.setAttribute("class", "imageSubreddit");
+    subredditNode.setAttribute("href", "/r/" + data.subreddit);
+    subredditNode.setAttribute("target", "_blank");
+    subredditNode.innerHTML = "r/" + data.subreddit;
+
+    var additionalLinks = document.createElement("article");
+    additionalLinks.setAttribute("class", "additionalLinks");
+    additionalLinks.appendChild(authorNode);
+    additionalLinks.appendChild(subredditNode);
+
+    var detailsNode = document.createElement("div");
+
+    detailsNode.setAttribute("class", "details");
+
+    detailsNode.setAttribute("class", detailsClass);
+
+    detailsNode.appendChild(countContainer);
+    detailsNode.appendChild(permalinkNode);
+    detailsNode.appendChild(additionalLinks);
+
+    return detailsNode;
+
+}
 
 // Toggles the image overlay (title, comment link, etc) when the mouse
 // hovers over and when it moves out
