@@ -1,5 +1,7 @@
-function CurrentState(subreddit, order, timeFrame, query, searchTime, searchOrder, user, allowNSFW, showDetails,showAllLinks) {
+function CurrentState(subreddit, order, timeFrame, query, searchTime, searchOrder, user, allowNSFW, showDetails, showAllLinks) {
     this.baseLink = "http://www.reddit.com";
+    this.imgurAlbumBaseLink = "https://api.imgur.com/3/album/";
+    this.imgurClient = "d452866b8d94ada";
 
     this.subreddit = subreddit;
     this.order = order;
@@ -10,7 +12,7 @@ function CurrentState(subreddit, order, timeFrame, query, searchTime, searchOrde
     this.user = user;
     this.allowNSFW = allowNSFW == "True";
     this.showDetails = showDetails == "True";
-    this.showAllLinks = showAllLinks=="True";
+    this.showAllLinks = showAllLinks == "True";
 
     this.lastFullname = "";
     this.pendingRequest = false;
@@ -18,6 +20,8 @@ function CurrentState(subreddit, order, timeFrame, query, searchTime, searchOrde
     this.minCol = -1;
     this.maxCol = -1;
     this.alreadyShown = {};
+    this.imgurAlbums = {};
+    this.currentAlbumImage = {};
     this.sendCount = 0;
     this.numCols = Math.floor((window.innerWidth - 15) / 375);
     if (this.numCols < 1) {
@@ -147,8 +151,12 @@ function parseJSON(responseText) {
                 var url = data.url;
                 var thumbUrl = url;
                 var isPicture = false;
+                var isImgurAlbum = false;
                 var match;
-                if (( match = url.match(/(i\.imgur\.com\/[A-z0-9]{5,7})(\.(jpeg|jpg|png|bmp))$/)) != null) {
+                if (( match = url.match(/imgur\.com\/a\/([A-z0-9]{5,7})/)) != null) {
+                    sendImgurRequest(match[1], fullname);
+                    isImgurAlbum = true;
+                } else if (( match = url.match(/(i\.imgur\.com\/[A-z0-9]{5,7})(\.(jpeg|jpg|png|bmp))$/)) != null) {
                     // if it's an direct image url from imgur, we can limit the image
                     // size to 640x640
                     // by adding 'l' to the end of the file hash
@@ -165,13 +173,13 @@ function parseJSON(responseText) {
                 }
 
                 // Only display the link if it's a image or user selected showing all links
-                if (isPicture || currentState.showAllLinks) {
+                if (isPicture || isImgurAlbum || currentState.showAllLinks) {
                     // If this is the max column, skip the first turn to let others catch up
                     if (currentState.maxCol >= 0 && currentColumn == currentState.maxCol) {
                         currentState.maxCol = -1;
                         currentColumn = (currentColumn + 1) % currentState.numCols;
                     }
-                    if (isPicture) {
+                    if (isPicture || isImgurAlbum) {
 
                         //image
                         var imageNode = document.createElement("img");
@@ -180,6 +188,7 @@ function parseJSON(responseText) {
                         } else {
                             imageNode.setAttribute("class", "image");
                         }
+                        imageNode.setAttribute("id", "img_" + fullname);
                         imageNode.setAttribute("src", thumbUrl);
                         imageNode.setAttribute("width", width);
                         imageNode.setAttribute("alt", title);
@@ -197,20 +206,58 @@ function parseJSON(responseText) {
                         } else {
                             detailsClass = "detailsOverlay";
                         }
+
                         detailsNode = createDetailsNode(data, detailsClass);
+
+                        var hoverContainerNode = document.createElement("div");
+                        hoverContainerNode.setAttribute("class", "hoverContainer");
+                        hoverContainerNode.appendChild(detailsNode);
+                        hoverContainerNode.appendChild(imageLinkNode);
 
                         //Container
                         var imageContainerNode = document.createElement("ul");
                         imageContainerNode.setAttribute("class", "imageContainer");
                         imageContainerNode.setAttribute("id", fullname);
                         if (!currentState.showDetails) {
-                            imageContainerNode.addEventListener("mouseover", displayOverlay);
-                            imageContainerNode.addEventListener('mouseout', hideOverlay);
+                            hoverContainerNode.addEventListener("mouseover", displayOverlay);
+                            hoverContainerNode.addEventListener('mouseout', hideOverlay);
                         }
 
-                        imageContainerNode.appendChild(detailsNode);
-                        imageContainerNode.appendChild(imageLinkNode);
+                        imageContainerNode.appendChild(hoverContainerNode);
 
+                        if (isImgurAlbum) {
+                            var prevImageNode = document.createElement("a");
+                            prevImageNode.setAttribute("class", "prevImage");
+                            prevImageNode.setAttribute("id", "prev_" + fullname);
+                            prevImageNode.onclick = getPrevImage;
+
+                            var albumInfoNode = document.createElement("p");
+                            albumInfoNode.setAttribute("class", "albumInfo");
+
+                            var nextImageNode = document.createElement("a");
+                            nextImageNode.setAttribute("class", "nextImage");
+                            nextImageNode.setAttribute("id", "next_" + fullname);
+                            nextImageNode.onclick = getNextImage;
+
+                            var albumImageInfoNode = document.createElement("p");
+                            albumImageInfoNode.setAttribute("class", "albumImageInfo");
+
+                            var albumNavigatorNode = document.createElement("div");
+                            albumNavigatorNode.setAttribute("class", "albumNavigator");
+                            albumNavigatorNode.setAttribute("id", "nav_" + fullname);
+
+                            albumNavigatorNode.appendChild(prevImageNode);
+                            albumNavigatorNode.appendChild(albumInfoNode);
+                            albumNavigatorNode.appendChild(nextImageNode);
+                            albumNavigatorNode.appendChild(albumImageInfoNode);
+
+                            imageNode.style.borderRadius = "0 0 3px 3px";
+                            detailsNode.style.borderRadius = "0 0 3px 3px";
+                            imageContainerNode.appendChild(albumNavigatorNode);
+
+                        }
+
+                        imageContainerNode.appendChild(hoverContainerNode);
                         document.getElementById("imageList" + currentColumn).appendChild(imageContainerNode);
 
                     } else if (currentState.showAllLinks) {
@@ -304,6 +351,7 @@ function createDetailsNode(data, detailsClass) {
 // hovers over and when it moves out
 function displayOverlay() {
     this.firstChild.style.display = 'block';
+
 };
 
 function hideOverlay() {
@@ -365,30 +413,75 @@ function toggleSettingsDropdown() {
     $("#settingsDropdown").toggle();
 }
 
-function sendSubredditSearchRequest(value) {
-    if (value != '') {
-        if (subredditSearchRequest != null) {
-            subredditSearchRequest.abort();
-        } else {
-            subredditSearchRequest = new XMLHttpRequest();
+// Prepare the request to retrieve the urls of images in an imgur album
+function sendImgurRequest(albumId, fullname) {
+    var httprequest = new XMLHttpRequest();
+
+    httprequest.open("GET", currentState.imgurAlbumBaseLink + albumId, true);
+    httprequest.setRequestHeader("Authorization", "Client-ID " + currentState.imgurClient);
+    httprequest.send();
+    httprequest.fullname = fullname;
+    httprequest.onreadystatechange = imgurAlbumHandler;
+}
+
+// Upon imgur album response, map the list of album image urls to the reddit link id/fullname
+function imgurAlbumHandler() {
+    if (this.readyState == 4) {
+        if (this.status == 200) {
+            var responseJSON = JSON.parse(this.responseText);
+            var images = responseJSON.data.images;
+            //map the list of album image urls to the reddit link id/fullname
+            currentState.imgurAlbums[this.fullname] = images;
+            currentState.currentAlbumImage[this.fullname] = 1;
+
+            if (images == null || images.length == 0) {
+                //Hide the element if the album is empty
+                document.getElementById(this.fullname).style.display = "none";
+            } else {
+                //Set the thumbnail to the first picture of the album
+                setAlbumImage(images, 0, this.fullname);
+            }
         }
-        var link = currentState.baseLink + "/api/subreddits_by_topic.json?query=" + encodeURIComponent(value);
-        subredditSearchRequest.open("GET", link, true);
-        subredditSearchRequest.send();
-        subredditSearchRequest.onreadystatechange = subredditSearchStateChangeHandler;
     }
 }
 
-function subredditSearchStateChangeHandler() {
-    if (this.readyState == 4) {
-        if (this.status == 200) {
-            parseJSON(this.responseText);
+// Helper function to change the image src of album thumbnail and the descriptions
+function setAlbumImage(images, index, fullname) {
+    image = images[index];
+    document.getElementById("img_" + fullname).setAttribute("src", image.link);
 
-            $("#subredditSearcher").autocomplete({
-                source : availableTags
-            });
-        }
+    //update the descriptions
+    var navNode = document.getElementById("nav_" + fullname);
+    navNode.childNodes[1].innerHTML = (index + 1) + " of " + images.length;
+    if (image.title != null) {
+        navNode.childNodes[3].innerHTML = image.title;
+    } else if (image.description != null) {
+        navNode.childNodes[3].innerHTML = image.description;
     }
+
+    //update the current image index
+    currentState.currentAlbumImage[fullname] = index;
+}
+
+function getPrevImage() {
+    var fullname = this.getAttribute("id").substring(5);
+
+    images = currentState.imgurAlbums[fullname];
+    cur = currentState.currentAlbumImage[fullname];
+    prev = cur == 0 ? images.length - 1 : cur - 1;
+
+    setAlbumImage(images, prev, fullname);
+
+}
+
+function getNextImage() {
+    var fullname = this.getAttribute("id").substring(5);
+
+    images = currentState.imgurAlbums[fullname];
+    cur = currentState.currentAlbumImage[fullname];
+    next = (cur + 1) % images.length;
+
+    setAlbumImage(images, next, fullname);
 }
 
 // Initial setup

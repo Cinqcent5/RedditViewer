@@ -91,7 +91,7 @@
 				{% endfor %}
 			</select>
 			{% endif %}
-			<section id="rightHeader">
+			<div id="rightHeader">
 
 				<div id='searchBar'>
 					<input type='text' id='searchBox' onkeydown='checkSearchBox(event.keyCode)' value="{{query}}" placeholder='Search'/>
@@ -117,7 +117,7 @@
 					Search
 				</button>
 
-				<section id="settingsContainer">
+				<div id="settingsContainer">
 					<button id="settingsButton" onclick="toggleSettingsDropdown()">
 						Settings
 					</button>
@@ -144,8 +144,8 @@
 							</li>
 						</ul>
 					</form>
-				</section>
-			</section>
+				</div>
+			</div>
 		</header>
 
 		<section id='gallery'>
