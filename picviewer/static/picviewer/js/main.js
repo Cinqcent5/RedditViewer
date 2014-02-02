@@ -250,6 +250,8 @@ function parseJSON(responseText) {
                             albumNavigatorNode.appendChild(albumInfoNode);
                             albumNavigatorNode.appendChild(nextImageNode);
                             albumNavigatorNode.appendChild(albumImageInfoNode);
+                            
+                            imageNode.removeAttribute("src");
 
                             imageNode.style.borderRadius = "0 0 3px 3px";
                             detailsNode.style.borderRadius = "0 0 3px 3px";
@@ -455,8 +457,11 @@ function setAlbumImage(images, index, fullname) {
     if (( match = link.match(/(i\.imgur\.com\/[A-z0-9]{5,7})(\.(jpeg|jpg|png|bmp))$/)) != null) {
         link = "http://" + match[1] + "l" + match[2];
     }
-    document.getElementById("img_" + fullname).setAttribute("src", link);
+    var imgNode=document.getElementById("img_" + fullname);
+    imgNode.setAttribute("src", link);
 
+    imgNode.parentNode.setAttribute("href",image.link);
+    
     //update the descriptions
     var navNode = document.getElementById("nav_" + fullname);
     navNode.childNodes[1].innerHTML = (index + 1) + " of " + images.length;
