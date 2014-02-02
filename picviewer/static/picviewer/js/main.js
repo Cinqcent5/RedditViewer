@@ -166,7 +166,7 @@ function parseJSON(responseText) {
                     // if it's an imgur url in the form of imgur.com/xxxxxxx , there
                     // will be a picture at
                     // i.imgur.com/xxxxxxxl.jpg that can be used for thumbnail
-                    thumbUrl = "http://i.imgur.com/" + match[1] + "l.jpg";
+                    thumbUrl = "http://i.imgur.com/" + match[1] + ".jpg";
                     isPicture = true;
                 } else if (url.match(/\.(jpeg|jpg|gif|png|bmp)$/) != null) {
                     isPicture = true;
@@ -400,7 +400,7 @@ function gotoSubreddit(value, keyCode) {
 
 // For very tall imgur images, use the original resolution image as the thumbnail
 function checkImageHeight() {
-    if (this.offsetHeight > 1200) {
+    if (this.offsetHeight > 1000) {
         url = this.getAttribute("src");
         if (url.match(/i\.imgur\.com\/[A-z0-9]{5,7}l\.(jpeg|jpg|png|bmp)$/)) {
             this.setAttribute("src", url.replace(/l\./, "."));
@@ -448,7 +448,14 @@ function imgurAlbumHandler() {
 // Helper function to change the image src of album thumbnail and the descriptions
 function setAlbumImage(images, index, fullname) {
     image = images[index];
-    document.getElementById("img_" + fullname).setAttribute("src", image.link);
+    var link = image.link;
+    var match;
+
+    // limit the image size to 640x640 by adding 'l' to the end of the file hash
+    if (( match = link.match(/(i\.imgur\.com\/[A-z0-9]{5,7})(\.(jpeg|jpg|png|bmp))$/)) != null) {
+        link = "http://" + match[1] + "l" + match[2];
+    }
+    document.getElementById("img_" + fullname).setAttribute("src", link);
 
     //update the descriptions
     var navNode = document.getElementById("nav_" + fullname);
