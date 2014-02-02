@@ -196,6 +196,7 @@ function parseJSON(responseText) {
 
                         var imageLinkNode = document.createElement("a");
                         imageLinkNode.setAttribute("class", "imageLink");
+                        imageLinkNode.setAttribute("id", "link_" + fullname);
                         imageLinkNode.setAttribute("href", url);
                         imageLinkNode.setAttribute("target", "_blank");
                         imageLinkNode.appendChild(imageNode);
@@ -211,6 +212,7 @@ function parseJSON(responseText) {
 
                         var hoverContainerNode = document.createElement("div");
                         hoverContainerNode.setAttribute("class", "hoverContainer");
+                        hoverContainerNode.setAttribute("class", "hover_" + fullname);
                         hoverContainerNode.appendChild(detailsNode);
                         hoverContainerNode.appendChild(imageLinkNode);
 
@@ -250,7 +252,7 @@ function parseJSON(responseText) {
                             albumNavigatorNode.appendChild(albumInfoNode);
                             albumNavigatorNode.appendChild(nextImageNode);
                             albumNavigatorNode.appendChild(albumImageInfoNode);
-                            
+
                             imageNode.removeAttribute("src");
 
                             imageNode.style.borderRadius = "0 0 3px 3px";
@@ -337,9 +339,9 @@ function createDetailsNode(data, detailsClass) {
 
     var detailsNode = document.createElement("div");
 
-    detailsNode.setAttribute("class", "details");
-
     detailsNode.setAttribute("class", detailsClass);
+
+    detailsNode.setAttribute("id", "details_" + data.name);
 
     detailsNode.appendChild(countContainer);
     detailsNode.appendChild(permalinkNode);
@@ -438,10 +440,37 @@ function imgurAlbumHandler() {
 
             if (images == null || images.length == 0) {
                 //Hide the element if the album is empty
-                document.getElementById(this.fullname).style.display = "none";
+                if (currentState.showAllLinks) {
+                    //Only displays the link details
+                    var containerNode = document.getElementById(this.fullname);
+                    var detailsNode = document.getElementById("details_" + this.fullname);
+
+                    detailsNode.setAttribute("class", "detailsOnly");
+                    detailsNode.style.borderRadius = "";
+
+                    containerNode.parentNode.replaceChild(detailsNode, containerNode);
+                } else {
+                    //Remove the whole post
+                    document.getElementById(this.fullname).style.display = "none";
+                }
             } else {
                 //Set the thumbnail to the first picture of the album
                 setAlbumImage(images, 0, this.fullname);
+            }
+        } else {
+            if (currentState.showAllLinks) {
+                //Only displays the link details
+                var containerNode = document.getElementById(this.fullname);
+                var detailsNode = document.getElementById("details_" + this.fullname);
+
+                detailsNode.setAttribute("class", "detailsOnly");
+                detailsNode.style.borderRadius = "";
+
+                containerNode.parentNode.replaceChild(detailsNode, containerNode);
+
+            } else {
+                //Remove the whole post
+                document.getElementById(this.fullname).style.display = "none";
             }
         }
     }
@@ -457,11 +486,11 @@ function setAlbumImage(images, index, fullname) {
     if (( match = link.match(/(i\.imgur\.com\/[A-z0-9]{5,7})(\.(jpeg|jpg|png|bmp))$/)) != null) {
         link = "http://" + match[1] + "l" + match[2];
     }
-    var imgNode=document.getElementById("img_" + fullname);
+    var imgNode = document.getElementById("img_" + fullname);
     imgNode.setAttribute("src", link);
 
-    imgNode.parentNode.setAttribute("href",image.link);
-    
+    imgNode.parentNode.setAttribute("href", image.link);
+
     //update the descriptions
     var navNode = document.getElementById("nav_" + fullname);
     navNode.childNodes[1].innerHTML = (index + 1) + " of " + images.length;

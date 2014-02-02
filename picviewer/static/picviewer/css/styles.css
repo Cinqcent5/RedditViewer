@@ -201,7 +201,6 @@ noscript {
 	vertical-align: top;
 }
 .imageContainer {
-	min-height: 100px;
 	margin: 10px;
 	position: relative;
 	display: block;
@@ -218,12 +217,14 @@ noscript {
 a.imageLink {
 	position: relative;
 }
+
 .image {
+	min-height: 100px;
 	border-radius: 3px;
 	display: block;
 }
-
 .imageWithDetails {
+	min-height: 100px;
 	border-radius: 0px 0px 3px 3px;
 	display: block;
 }
