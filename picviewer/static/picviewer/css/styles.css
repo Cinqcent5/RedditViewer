@@ -319,6 +319,10 @@ a.imageLink {
 	display: inline-block;
 	width: 16px;
 	height: 16px;
+	-moz-user-select: -moz-none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 .prevImage {
 	background: url("/picviewer/static/picviewer/media/arrows.png") 0 0;

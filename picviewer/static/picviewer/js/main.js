@@ -228,7 +228,7 @@ function parseJSON(responseText) {
                         imageContainerNode.appendChild(hoverContainerNode);
 
                         if (isImgurAlbum) {
-                            var prevImageNode = document.createElement("a");
+                            var prevImageNode = document.createElement("span");
                             prevImageNode.setAttribute("class", "prevImage");
                             prevImageNode.setAttribute("id", "prev_" + fullname);
                             prevImageNode.onclick = getPrevImage;
@@ -236,7 +236,7 @@ function parseJSON(responseText) {
                             var albumInfoNode = document.createElement("p");
                             albumInfoNode.setAttribute("class", "albumInfo");
 
-                            var nextImageNode = document.createElement("a");
+                            var nextImageNode = document.createElement("span");
                             nextImageNode.setAttribute("class", "nextImage");
                             nextImageNode.setAttribute("id", "next_" + fullname);
                             nextImageNode.onclick = getNextImage;
