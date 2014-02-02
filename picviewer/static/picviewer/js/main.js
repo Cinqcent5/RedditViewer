@@ -212,7 +212,7 @@ function parseJSON(responseText) {
 
                         var hoverContainerNode = document.createElement("div");
                         hoverContainerNode.setAttribute("class", "hoverContainer");
-                        hoverContainerNode.setAttribute("class", "hover_" + fullname);
+                        hoverContainerNode.setAttribute("id", "hover_" + fullname);
                         hoverContainerNode.appendChild(detailsNode);
                         hoverContainerNode.appendChild(imageLinkNode);
 
@@ -256,7 +256,7 @@ function parseJSON(responseText) {
                             imageNode.removeAttribute("src");
 
                             imageNode.style.borderRadius = "0 0 3px 3px";
-                            detailsNode.style.borderRadius = "0 0 3px 3px";
+                            detailsNode.style.borderRadius = "0";
                             imageContainerNode.appendChild(albumNavigatorNode);
 
                         }
