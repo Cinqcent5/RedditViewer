@@ -101,12 +101,19 @@ def mainView(request, subreddit, order, user):
     response = render(request, 'picviewer/index.html', context)
     
     
+    # set the cookies for first time users
     if not request.COOKIES.has_key('riv'):
-        # first time user
-        uid = uuid.uuid4()
-        response.set_cookie(key='riv', value=uid, max_age=31536000)
-        user = User(uid=uid, created_date=datetime.datetime.now(), last_visited_date=datetime.datetime.now())
-        user.save()
+        if "HTTP_USER_AGENT" in request.META:
+            user_agent=request.META["HTTP_USER_AGENT"]
+        else:
+            user_agent=""
+        
+        # don't set cookies for search bots
+        if "Googlebot" not in user_agent:
+            uid = uuid.uuid4()
+            response.set_cookie(key='riv', value=uid, max_age=31536000)
+            user = User(uid=uid, created_date=datetime.datetime.now(), last_visited_date=datetime.datetime.now(),user_agent=user_agent)
+            user.save()
         
     return  response
 
