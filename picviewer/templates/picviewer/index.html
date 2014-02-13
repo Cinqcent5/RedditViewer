@@ -37,8 +37,10 @@
 		{% endif %}
 
 		<meta name="author" content="David Zou">
-		<meta name="description" content="Website to quickly view pictures/gifs from Reddit">
-		<meta name="keywords" content="reddit, pictures, cats">
+		<meta name="description" content="Image viewer for Reddit.
+		{% if name != "" %}
+		r/{{name}}: {{subredditDescription}}
+		{% endif %}">
 		<!-- Date: 2014-01-22 -->
 	</head>
 	<body>

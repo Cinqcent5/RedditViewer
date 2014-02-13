@@ -54,11 +54,13 @@ def mainView(request, subreddit, order, user):
         context['query'] = request.GET["q"]
     else:
         context['query'] = ""
-        
+    
+    # retrieve subreddit information    
     if(subreddit == ""):
         context['image'] = "http://b.thumbs.redditmedia.com/harEHsUUZVajabtC.png"
         context['link'] = "http://www.reddit.com";
         context['name'] = ""
+        context['subredditDescription'] = ""
     else:
         try:
             h1 = urllib2.urlopen("http://www.reddit.com/r/" + subreddit + "/about.json", timeout=5)
@@ -66,10 +68,12 @@ def mainView(request, subreddit, order, user):
             context['image'] = jsonObj["data"]["header_img"]
             context['link'] = "http://www.reddit.com/r/" + subreddit
             context['name'] = jsonObj["data"]["display_name"]
+            context['subredditDescription'] = jsonObj["data"]["public_description"]
         except Exception:
             context['image'] = "http://b.thumbs.redditmedia.com/harEHsUUZVajabtC.png"
             context['link'] = "http://www.reddit.com"
             context['name'] = ""
+            context['subredditDescription'] = ""
     
     context['userOrders'] = ['hot', 'new', 'controversial', 'top']
     context['user'] = user
